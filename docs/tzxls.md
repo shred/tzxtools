@@ -7,10 +7,10 @@ Ths tool shows the block numbers, block types and some block contents of a TZX f
 ## Usage
 
 ```
-tzxls [-h] [-s] [file]
+tzxls [-h] [-s] file [file ...]
 ```
 
-* `file`: TZX file to read from, or `stdin` if not given.
+* `file`: TZX file or files to read from, or `stdin` if not given.
 * `-s`, `--short`: Only shows the names found in ZX Spectrum file headers.
 * `-h`, `--help`: Show help message and exit.
 
