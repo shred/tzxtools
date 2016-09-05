@@ -24,7 +24,7 @@ from tzxlib.convert import convert
 
 class TapFile():
     def create(data):
-        if data[0] == 0x00 and len(data) == 19:
+        if len(data) == 19 and data[0] == 0x00:
             return TapHeader(data)
         else:
             return TapData(data)
@@ -78,7 +78,7 @@ class TapHeader(TapFile):
     def __str__(self):
         if (self.data[1] == 3):
             if (self.param1() == 0x4000 and self.length() == 6912):
-                result = 'Screen: %s' % (self.type(), self.name())
+                result = 'Screen: %s' % (self.name())
             else:
                 result = '%s: %s (start: %s, %s bytes)' % (self.type(), self.name(), self.param1(), self.length())
         else:
@@ -93,7 +93,9 @@ class TapData(TapFile):
         self.data = data
 
     def __str__(self):
-        if self.data[0] == 0x00:
+        if len(self.data) < 2:
+            result = '%d bytes of incomplete data' % (len(self.data))
+        elif self.data[0] == 0x00:
             result = '%d bytes of bogus header' % (len(self.data) - 2)
         else:
             result = '%d bytes of data' % (len(self.data) - 2)
