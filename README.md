@@ -4,12 +4,13 @@ This is a collection of command line tools for processing [TZX](http://www.world
 
 ## The Tools
 
-* `tzxcat`: Extracts file data from a TZX file
-* `tzxcleanup`: Removes all clutter and leaves a clean tape file
-* `tzxcut`: Cuts blocks from a TZX file
-* `tzxls`: Shows the contents of a TZX file
-* `tzxsplit`: Splits a TZX file into separate programs
-* `tzxmerge`: Concatenates multiple TZX files into one file
+* [`tzxcat`](docs/tzxcat.md): Extracts file data from a TZX file
+* [`tzxcleanup`](docs/tzxcleanup.md): Removes all clutter and leaves a clean tape file
+* [`tzxcut`](docs/tzxcut.md): Cuts blocks from a TZX file
+* [`tzxls`](docs/tzxls.md): Shows the contents of a TZX file
+* [`tzxmerge`](docs/tzxmerge.md): Concatenates multiple TZX files into one file
+* [`tzxsplit`](docs/tzxsplit.md): Splits a TZX file into separate programs
+* [`tzxwav`](docs/tzxwav.md): Converts WAV file tape recordings to TZX files
 
 ## Contribute
 

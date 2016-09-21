@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from struct import unpack
+from struct import pack, unpack
 
 from tzxlib.tapfile import TapFile
 
@@ -80,6 +80,10 @@ class TzxbBlock():
 class TzxbData(TzxbBlock):
     id = 0x10
     type = 'Standard Speed Data Block'
+
+    def setup(self, tap):
+        self.tap = tap
+        self.data = pack('<HH', 1000, len(tap.data))
 
     def read(self, tzx):
         self.data = tzx.read(0x04)

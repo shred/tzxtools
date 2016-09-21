@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+#
+# tzxtools - a collection for processing tzx files
+#
+# Copyright (C) 2016 Richard "Shred" Körber
+#   https://github.com/shred/tzxtools
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import argparse
+import sys
+import wave
+
+from tzxlib.loader import TapeLoader
+
+tresholds  = { 'low': 500, 'med': 3500, 'high':5000 }
+tolerances = { 'low': 1.1,  'med': 1.3,  'high': 1.8 }
+
+lastPercent = None
+def showProgress(current, max):
+    global lastPercent
+    percent = int(current * 100 / max)
+    if lastPercent is None or percent != lastPercent:
+        lastPercent = percent
+        halfPercent = int(percent / 2)
+        print('%3d%% |%s%s|' % (percent, '#'*halfPercent, '-'*(50-halfPercent)), end='\r')
+
+parser = argparse.ArgumentParser(description='Generates TZX from WAV file')
+parser.add_argument('file',
+            nargs='?',
+            help='WAV file')
+parser.add_argument('-o', '--to',
+            dest='to',
+            metavar='TARGET',
+            default='/dev/stdout',
+            help='target file, stdout if omitted')
+parser.add_argument('-p', '--progress',
+            dest='progress',
+            action='store_true',
+            help='show progress bar')
+parser.add_argument('-t', '--treshold',
+            choices=['low', 'med', 'high'],
+            default='med',
+            dest='treshold',
+            help='sound/noise ratio treshold')
+parser.add_argument('-T', '--tolerance',
+            choices=['low', 'med', 'high'],
+            default='med',
+            dest='tolerance',
+            help='tape speed flutter tolerance')
+parser.add_argument('-c', '--clock',
+            dest='clock',
+            default=3500000,
+            type=int,
+            help='Reference Z80 CPU clock, in Hz')
+parser.add_argument('-D', '--debug',
+            dest='debug',
+            action='count',
+            help='enable debug output, give multiple times to increase verbosity')
+
+args = parser.parse_args()
+
+loader = TapeLoader(debug=args.debug,
+        treshold=tresholds[args.treshold],
+        tolerance=tolerances[args.tolerance],
+        cpufreq=args.clock,
+        progress=showProgress if args.progress else None)
+
+try:
+    tzx = loader.load(args.file)
+    tzx.write(args.to)
+except KeyboardInterrupt:
+    print("D BREAK - CONT repeats, 0:1", file=sys.stderr)
+    exit(1)
+
+if args.progress:
+    print()

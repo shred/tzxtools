@@ -92,6 +92,9 @@ class TapData(TapFile):
     def __init__(self, data):
         self.data = data
 
+    def length(self):
+        return len(self.data) - 2
+
     def __str__(self):
         if len(self.data) < 2:
             result = '%d bytes of incomplete data' % (len(self.data))
