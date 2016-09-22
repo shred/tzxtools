@@ -117,21 +117,33 @@ class TapeLoader():
 
         while True:
             lowLen = self._testBitPulse(expectedLowT, '0')
-            if lowLen is not None:
-                tapCreator.shift(False)
-                continue
-
             highLen = self._testBitPulse(expectedHighT, '1')
-            if highLen is not None:
-                tapCreator.shift(True)
+
+            if lowLen is None and highLen is None:
+                # bitstream lost
+                if len(tapCreator) <= 2:
+                    raise BadBlock
+                tap = tapCreator.createTap()
+                if self.debug >= 1:
+                    self._showBlock(tap, leaderPos, syncPos, self.samples.position())
+                return tap
+
+            if lowLen is not None and lowLen[0]:
+                # a '0' bit for sure
+                tapCreator.shift(False)
+                self.samples.advance(lowLen[1])
                 continue
 
-            if len(tapCreator) <= 2:
-                raise BadBlock
-            tap = tapCreator.createTap()
-            if self.debug >= 1:
-                self._showBlock(tap, leaderPos, syncPos, self.samples.position())
-            return tap
+            if highLen is not None:
+                # a '1' bit for sure
+                tapCreator.shift(True)
+                self.samples.advance(highLen[1])
+                continue
+
+            # maybe a '0' bit, advance and hope for good luck
+            tapCreator.shift(False)
+            self.samples.advance(lowLen[1])
+            continue
 
     def _testLeaderPulse(self):
         self.samples.ensure()
@@ -246,18 +258,14 @@ class TapeLoader():
             count += 1
             limit = int(frames * self.tolerance)
             if count >= limit:
-                 # nothing found, assume a wave with average length
                 if self.debug >= 4:
                     print(' ! {} no wave end in range, bias={} limit={}'.format(tag, mma[2], limit), file=sys.stderr)
-                count = frames
-                break
+                return (False, frames)
 
         # Success, this is a bit
-        length = self.samples.toFrames(count / 2)
         if self.debug >= 3:
             print('   {} @{:n}~{:n}'.format(tag, self.lastPulse, self.lastPulse + count), file=sys.stderr)
-        self.samples.advance(count)
-        return length
+        return (True, count)
 
     def _showBlock(self, tap, leaderPos, syncPos, endPos):
         if isinstance(tap, TapHeader):
