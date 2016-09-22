@@ -65,6 +65,14 @@ parser.add_argument('-c', '--clock',
             default=3500000,
             type=int,
             help='Reference Z80 CPU clock, in Hz')
+parser.add_argument('-s', '--start',
+            dest='start',
+            type=int,
+            help='Start at WAV frame number')
+parser.add_argument('-e', '--end',
+            dest='end',
+            type=int,
+            help='End at WAV frame number')
 parser.add_argument('-D', '--debug',
             dest='debug',
             action='count',
@@ -79,7 +87,7 @@ loader = TapeLoader(debug=args.debug,
         progress=showProgress if args.progress else None)
 
 try:
-    tzx = loader.load(args.file)
+    tzx = loader.load(args.file, startFrame=args.start, endFrame=args.end)
     tzx.write(args.to)
 except KeyboardInterrupt:
     print("D BREAK - CONT repeats, 0:1", file=sys.stderr)

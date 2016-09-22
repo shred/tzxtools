@@ -52,9 +52,10 @@ class TapeLoader():
         self.treshold = treshold
         self.tolerance = tolerance
 
-    def load(self, filename):
+    def load(self, filename, startFrame=None, endFrame=None):
         try:
             self.samples.open(filename)
+            self.samples.fileRange(startFrame, endFrame)
             tzx = TzxFile()
             while True:
                 try:
@@ -275,6 +276,8 @@ class TapeReader():
         self.progress = progress
         self.maxlenT = maxlenT
         self.invert = False
+        self.startFrame = None
+        self.endFrame = None
 
     def open(self, filename):
         """ Opens the given WAV file name """
@@ -284,6 +287,10 @@ class TapeReader():
         self.bytesPerFrame = self.wav.getnchannels() * self.wav.getsampwidth()
         self.maxlen = self.toFrames(self.maxlenT)
         self.samples = deque(maxlen=self.maxlen)
+
+    def fileRange(self, startFrame, endFrame):
+        self.startFrame = startFrame
+        self.endFrame = endFrame
 
     def close(self):
         """ Closes the tape reader """
@@ -305,6 +312,17 @@ class TapeReader():
 
     def ensure(self, needed=None):
         """ Ensures buffer is filled with sufficient samples """
+        if self.startFrame is not None and self.frameCount < self.startFrame:
+            skip = self.startFrame - self.frameCount
+            self.frameCount = self.startFrame
+            self.startFrame = None
+            while skip > 0:
+                sf = skip % 1000
+                skip -= sf
+                frames = self.wav.readframes(sf)
+                if not frames:
+                    raise EOFError()
+
         if needed is not None and len(self.samples) >= needed:
             return # sufficient data available
 
@@ -327,6 +345,8 @@ class TapeReader():
         for i in range(0, frames):
             self.samples.popleft()
         self.frameCount += frames
+        if self.endFrame is not None and self.frameCount > self.endFrame:
+            raise EOFError()
         if self.progress is not None:
             self.progress(self.frameCount, self.wav.getnframes())
 
