@@ -21,6 +21,7 @@
 
 import argparse
 import sys
+from time import time
 import wave
 
 from tzxlib.loader import TapeLoader
@@ -30,13 +31,21 @@ tolerances = { 'low': 1.1,  'med': 1.3,  'high': 1.8 }
 leaderMins = { 'none': 2, 'short': 10, 'normal': 40, 'long': 100 }
 
 lastPercent = None
+startTime = None
 def showProgress(current, max):
-    global lastPercent
+    global lastPercent, startTime
+    if startTime is None:
+        startTime = time()
     percent = int(current * 100 / max)
     if lastPercent is None or percent != lastPercent:
         lastPercent = percent
         halfPercent = int(percent / 2)
-        print('%3d%% |%s%s|' % (percent, '#'*halfPercent, '-'*(50-halfPercent)), end='\r')
+        if lastPercent > 3:
+            now = time()
+            remainSecs = ((now - startTime) * 100 / lastPercent) + startTime - now
+            print('%3d%% |%s%s| %2d:%02d' % (percent, '#'*halfPercent, '-'*(50-halfPercent), remainSecs // 60 , remainSecs % 60), end='\r')
+        else:
+            print('%3d%% |%s%s|' % (percent, '#'*halfPercent, '-'*(50-halfPercent)), end='\r')
 
 parser = argparse.ArgumentParser(description='Generates TZX from WAV file')
 parser.add_argument('file',
