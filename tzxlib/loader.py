@@ -46,11 +46,13 @@ class TapeLoader():
     lowT    =  855      # 0 bit pulse
     highT   = 1710      # 1 bit pulse
 
-    def __init__(self, progress=None, debug=None, treshold=3500, tolerance=1.3, cpufreq=3500000):
-        self.samples = TapeReader(progress=progress, cpufreq=cpufreq, maxlenT=self.leaderT*3)
+    def __init__(self, progress=None, debug=None, treshold=3500, tolerance=1.3, leaderMin=20, cpufreq=3500000):
+        maxlenT = self.leaderT * 2.2 * tolerance
+        self.samples = TapeReader(progress=progress, cpufreq=cpufreq, maxlenT=maxlenT)
         self.debug = debug if debug is not None else 0
         self.treshold = treshold
         self.tolerance = tolerance
+        self.leaderMin = leaderMin
 
     def load(self, filename, startFrame=None, endFrame=None):
         try:
@@ -91,19 +93,20 @@ class TapeLoader():
         leaderPos = self.lastPulse
 
         # Skip leader, wait for sync
-        leaderLengths = deque([length], maxlen=30)
+        leaderLengths = deque([length], maxlen=max(self.leaderMin, 20))
         while True:
             length = self._testLeaderPulse()
             if length is not None:
                 leaderLengths.append(length)
                 continue
 
-            expectedSyncT = (sum(leaderLengths) * self.syncT) / (len(leaderLengths) * self.leaderT)
-            length = self._testSyncPulse(expectedSyncT)
-            if length is not None:
-                # Sync was found
-                syncPos = self.lastPulse
-                break
+            if len(leaderLengths) >= self.leaderMin:
+                expectedSyncT = (sum(leaderLengths) * self.syncT) / (len(leaderLengths) * self.leaderT)
+                length = self._testSyncPulse(expectedSyncT)
+                if length is not None:
+                    # Sync was found
+                    syncPos = self.lastPulse
+                    break
 
             # Leader was lost
             raise BadBlock()
@@ -196,9 +199,10 @@ class TapeLoader():
         count = frames * 3 // 4
         while (invert == False and self.samples[count] < mma[2]) or (invert == True and self.samples[count] > mma[2]):
             count += 1
-            if count >= frames * self.tolerance:
+            limit = int(frames * self.tolerance)
+            if count >= limit:
                 if self.debug >= 4:
-                    print(' ! - no wave end in range', file=sys.stderr)
+                    print(' ! - no wave end in range, bias={} limit={}'.format(mma[2], limit), file=sys.stderr)
                 return None
 
         # Success, this is a sync
@@ -240,15 +244,18 @@ class TapeLoader():
         count = frames * 3 // 4
         while self.samples[count] < mma[2]:
             count += 1
-            if count >= frames * self.tolerance:
+            limit = int(frames * self.tolerance)
+            if count >= limit:
+                 # nothing found, assume a wave with average length
                 if self.debug >= 4:
-                    print(' ! {} no wave end in range'.format(tag), file=sys.stderr)
-                return None
+                    print(' ! {} no wave end in range, bias={} limit={}'.format(tag, mma[2], limit), file=sys.stderr)
+                count = frames
+                break
 
         # Success, this is a bit
         length = self.samples.toFrames(count / 2)
         if self.debug >= 3:
-            print('   {} @{:n}~{:n} {} {} {}'.format(tag, self.lastPulse, self.lastPulse + count, mma[0], mma[1], mma[2]), file=sys.stderr)
+            print('   {} @{:n}~{:n}'.format(tag, self.lastPulse, self.lastPulse + count), file=sys.stderr)
         self.samples.advance(count)
         return length
 
