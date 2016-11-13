@@ -193,10 +193,10 @@ class TapeLoader():
             return None
 
         # Is it a full wave?
-        if self.samples[frames // 4] > mma[2] and self.samples[frames * 3 // 4] < mma[2]:
+        if self.samples[frames // 4] < mma[2] and self.samples[frames * 3 // 4] > mma[2]:
             invert = False
             tag = '-'
-        elif self.samples[frames // 4] < mma[2] and self.samples[frames * 3 // 4] > mma[2]:
+        elif self.samples[frames // 4] > mma[2] and self.samples[frames * 3 // 4] < mma[2]:
             invert = True
             tag = '~'
         else:
@@ -209,7 +209,7 @@ class TapeLoader():
 
         # Find next zero crossing
         count = frames * 3 // 4
-        while (invert == False and self.samples[count] < mma[2]) or (invert == True and self.samples[count] > mma[2]):
+        while (invert == False and self.samples[count] > mma[2]) or (invert == True and self.samples[count] < mma[2]):
             count += 1
             limit = int(frames * self.tolerance)
             if count >= limit:
@@ -231,35 +231,35 @@ class TapeLoader():
 
         # Convert to samples
         frames = self.samples.toFrames(tCycles) * 2
-        mma = self.samples.minMaxAvg(frames)
+        (minv, maxv, bias) = self.samples.minMaxAvg(frames)
 
         # Is amplitude above treshold?
-        if abs(mma[1] - mma[0]) < self.treshold:
+        if abs(maxv - minv) < self.treshold:
             if self.debug >= 4:
                 print(' ! {} below treshold, {} < {}'.format(
                         tag,
-                        abs(mma[1] - mma[0]),
+                        abs(maxv - minv),
                         self.treshold), file=sys.stderr)
             return None
 
         # Is it a full wave?
-        if not (self.samples[frames // 4] > mma[2] and self.samples[frames * 3 // 4] < mma[2]):
+        if not (self.samples[frames // 4] < bias and self.samples[frames * 3 // 4] > bias):
             if self.debug >= 4:
                 print(' ! {} not a full wave, lo={} hi={} bias={}'.format(
                         tag,
                         self.samples[frames // 4],
                         self.samples[frames * 3 // 4],
-                        mma[2]), file=sys.stderr)
+                        bias), file=sys.stderr)
             return None
 
         # Find next zero crossing
         count = frames * 3 // 4
-        while self.samples[count] < mma[2]:
+        while self.samples[count] > bias:
             count += 1
             limit = int(frames * self.tolerance)
             if count >= limit:
                 if self.debug >= 4:
-                    print(' ! {} no wave end in range, bias={} limit={}'.format(tag, mma[2], limit), file=sys.stderr)
+                    print(' ! {} no wave end in range, bias={} limit={}'.format(tag, bias, limit), file=sys.stderr)
                 return (False, frames)
 
         # Success, this is a bit
