@@ -46,10 +46,11 @@ class TapeLoader():
     lowT    =  855      # 0 bit pulse
     highT   = 1710      # 1 bit pulse
 
-    def __init__(self, progress=None, debug=None, treshold=3500, tolerance=1.3, leaderMin=20, cpufreq=3500000):
+    def __init__(self, progress=None, debug=None, verbose=false, treshold=3500, tolerance=1.3, leaderMin=20, cpufreq=3500000):
         maxlenT = self.leaderT * 2.2 * tolerance
         self.samples = TapeReader(progress=progress, cpufreq=cpufreq, maxlenT=maxlenT)
         self.debug = debug if debug is not None else 0
+        self.verbose = verbose
         self.treshold = treshold
         self.tolerance = tolerance
         self.leaderMin = leaderMin
@@ -64,6 +65,8 @@ class TapeLoader():
                     tzxbd = TzxbData()
                     tzxbd.setup(self._loadBlock())
                     tzx.blocks.append(tzxbd)
+                    if self.verbose:
+                        print(str(tzxbd), file=sys.stderr)
                 except BadBlock:
                     continue    # Try again with the next block
                 except EOFError:

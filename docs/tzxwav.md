@@ -9,16 +9,17 @@ Reads ZX Spectum tapes from a WAV file and converts it to TZX.
 ## Usage
 
 ```
-tzxwav [-h] [-o TARGET] [-p] [-t {low,med,high}] [-T {low,med,high}]
-       [-l {none,short,normal,long}] [-c CLOCK] [-s START] [-e END]
-       [-D] file
+tzxwav [-h] [-o TARGET] [-p] [-v] [-t {low,med,high}]
+       [-T {low,med,high}] [-l {none,short,normal,long}] [-c CLOCK]
+       [-s START] [-e END] [-D] file
 ```
 
 * `file`: WAV file to read from. Supported is mono and stereo, 8 and 16 bit per channel, any sampling rate. Other file formats are not supported.
 * `-o`, `--to`: Target file. If omitted, `stdout` is used.
 * `-p`, `--progress`: Show a progress bar on `stderr`.
+* `-v`, `--verbose`: Be verbose, show blocks as they are found.
 * `-t`, `--treshold`: Change sound/noise ratio treshold. Default is `mid`. Try `low` if data blocks are missing or shorter than expected. Try `high` if data blocks are longer than expected.
-* `-T`, `--tolerance`: Change tape speed flutter tolerance. Default is `mid`. Try `low` if the TZX file contains many useless blocks. Try `high` if you miss headers or data blocks in the TZX file, or if there are many consecutive data blocks with bad CRC.
+* `-T`, `--tolerance`: Change tape speed flutter tolerance. Default is `mid`. Try `low` if the TZX file contains many useless blocks. Try `high` if you miss headers or data blocks in the TZX file, or if data blocks are shorter than expected.
 * `-l`, `--leader`: Acceptable minimal leader signal length. Default is `normal`. If there are a lot of headerless blocks, or if there are blocks missing in the TZX file, it is worth a try to play with this parameter. `none` even accepts a single header pulse.
 * `-s`, `--start`: Set the first frame of the WAV file to be read. If not set, the start of file is used.
 * `-e`, `--end`: Set the last frame of the WAV file to be read. For technical reasons, this limit may be exceeded by a few frames. If not set, or if set out of range, the file will be read to the end.

@@ -43,9 +43,9 @@ def showProgress(current, max):
         if lastPercent > 3:
             now = time()
             remainSecs = ((now - startTime) * 100 / lastPercent) + startTime - now
-            print('%3d%% |%s%s| %2d:%02d' % (percent, '#'*halfPercent, '-'*(50-halfPercent), remainSecs // 60 , remainSecs % 60), end='\r')
+            print('%3d%% |%s%s| %2d:%02d' % (percent, '#'*halfPercent, '-'*(50-halfPercent), remainSecs // 60 , remainSecs % 60), end='\r', file=sys.stderr)
         else:
-            print('%3d%% |%s%s|' % (percent, '#'*halfPercent, '-'*(50-halfPercent)), end='\r')
+            print('%3d%% |%s%s|' % (percent, '#'*halfPercent, '-'*(50-halfPercent)), end='\r', file=sys.stderr)
 
 parser = argparse.ArgumentParser(description='Generates TZX from WAV file')
 parser.add_argument('file',
@@ -60,6 +60,10 @@ parser.add_argument('-p', '--progress',
             dest='progress',
             action='store_true',
             help='show progress bar')
+parser.add_argument('-v', '--verbose',
+            dest='verbose',
+            action='store_true',
+            help='show blocks as they are found')
 parser.add_argument('-t', '--treshold',
             choices=['low', 'med', 'high'],
             default='med',
@@ -100,7 +104,8 @@ loader = TapeLoader(debug=args.debug,
         tolerance=tolerances[args.tolerance],
         leaderMin=leaderMins[args.leader],
         cpufreq=args.clock,
-        progress=showProgress if args.progress else None)
+        progress=showProgress if args.progress else None,
+        verbose=args.verbose)
 
 try:
     tzx = loader.load(args.file, startFrame=args.start, endFrame=args.end)
