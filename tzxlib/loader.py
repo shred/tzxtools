@@ -46,7 +46,7 @@ class TapeLoader():
     lowT    =  855      # 0 bit pulse
     highT   = 1710      # 1 bit pulse
 
-    def __init__(self, progress=None, debug=None, verbose=false, treshold=3500, tolerance=1.3, leaderMin=20, cpufreq=3500000):
+    def __init__(self, progress=None, debug=None, verbose=False, treshold=3500, tolerance=1.2, leaderMin=20, cpufreq=3500000):
         maxlenT = self.leaderT * 2.2 * tolerance
         self.samples = TapeReader(progress=progress, cpufreq=cpufreq, maxlenT=maxlenT)
         self.debug = debug if debug is not None else 0
@@ -117,36 +117,50 @@ class TapeLoader():
         # Read data block
         expectedLowT = (sum(leaderLengths) * self.lowT) / (len(leaderLengths) * self.leaderT)
         expectedHighT = (sum(leaderLengths) * self.highT) / (len(leaderLengths) * self.leaderT)
+        letMeGuess = False
 
         while True:
             lowLen = self._testBitPulse(expectedLowT, '0')
             highLen = self._testBitPulse(expectedHighT, '1')
 
-            if lowLen is None and highLen is None:
-                # bitstream lost
-                if len(tapCreator) <= 2:
-                    raise BadBlock
-                tap = tapCreator.createTap()
-                if self.debug >= 1:
-                    self._showBlock(tap, leaderPos, syncPos, self.samples.position())
-                return tap
-
+            # We detected a bit for sure?
             if lowLen is not None and lowLen[0]:
-                # a '0' bit for sure
+                letMeGuess = True
+                self._advance(False, lowLen[1])
                 tapCreator.shift(False)
-                self.samples.advance(lowLen[1])
                 continue
 
-            if highLen is not None:
-                # a '1' bit for sure
+            if highLen is not None and highLen[0]:
+                letMeGuess = True
+                self._advance(True, highLen[1])
                 tapCreator.shift(True)
-                self.samples.advance(highLen[1])
                 continue
 
-            # maybe a '0' bit, advance and hope for good luck
-            tapCreator.shift(False)
-            self.samples.advance(lowLen[1])
-            continue
+            # We're not sure, but maybe we're lucky...
+            if lowLen is not None and highLen is None:
+                self._advance(False, lowLen[1], tag='gap')
+                tapCreator.shift(False)
+                continue
+
+            if highLen is not None and lowLen is None:
+                self._advance(True, highLen[1], tag='gap')
+                tapCreator.shift(True)
+                continue
+
+            # Hope for a broken Low bit, but not too often...
+            if lowLen is not None and highLen is not None and letMeGuess:
+                letMeGuess = False
+                self._advance(False, lowLen[1], tag='noise')
+                tapCreator.shift(False)
+                continue
+
+            # Seems we have lost the bit stream...
+            if len(tapCreator) <= 2:
+                raise BadBlock
+            tap = tapCreator.createTap()
+            if self.debug >= 1:
+                self._showBlock(tap, leaderPos, syncPos, self.samples.position())
+            return tap
 
     def _testLeaderPulse(self):
         self.samples.ensure()
@@ -184,47 +198,45 @@ class TapeLoader():
         self.samples.ensure()
 
         # Convert to samples
-        frames = self.samples.toFrames(tCycles) * 2
-        mma = self.samples.minMaxAvg(frames)
+        frames = self.samples.toFrames(tCycles * 2)
+        (minv, maxv, bias) = self.samples.minMaxAvg(frames)
 
         # Is amplitude above treshold?
-        if abs(mma[1] - mma[0]) < self.treshold:
+        if abs(maxv - minv) < self.treshold:
             if self.debug >= 4:
                 print(' ! - below treshold, {} < {}'.format(
-                        abs(mma[1] - mma[0]),
+                        abs(maxv - minv),
                         self.treshold), file=sys.stderr)
             return None
 
-        # Is it a full wave?
-        if self.samples[frames // 4] < mma[2] and self.samples[frames * 3 // 4] > mma[2]:
-            invert = False
-            tag = '-'
-        elif self.samples[frames // 4] > mma[2] and self.samples[frames * 3 // 4] < mma[2]:
-            invert = True
+        # Find next zero crossing, normal signal
+        self.samples.invert = False
+        tag = '-'
+        count = self._findZeroCrossing(frames, bias, tag)
+        if not count:
+            # Find next zero crossing, inverted signal
+            self.samples.invert = True
+            (minv, maxv, bias) = (-maxv, -minv, -bias)
             tag = '~'
-        else:
-            if self.debug >= 4:
-                print(' ! - not a full wave, lo={} hi={} bias={}'.format(
-                        self.samples[frames // 4],
-                        self.samples[frames * 3 // 4],
-                        mma[2]), file=sys.stderr)
-            return None
-
-        # Find next zero crossing
-        count = frames * 3 // 4
-        while (invert == False and self.samples[count] > mma[2]) or (invert == True and self.samples[count] < mma[2]):
-            count += 1
-            limit = int(frames * self.tolerance)
-            if count >= limit:
-                if self.debug >= 4:
-                    print(' ! - no wave end in range, bias={} limit={}'.format(mma[2], limit), file=sys.stderr)
+            count = self._findZeroCrossing(frames, bias, tag)
+            if not count:
                 return None
 
+        # Integrate both half waves
+        countHalf = count // 2
+        w1 = sum([self.samples[i] for i in range(0, countHalf)]) / countHalf
+        w2 = sum([self.samples[i] for i in range(countHalf, count)]) / countHalf
+
+        # Is it a full wave?
+        if not (w1 < bias and w2 > bias and abs(w2 - w1) >= self.treshold):
+            if self.debug >= 4:
+                print(' ! {} not a full wave, w1={} w2={} bias={}'.format(tag, w1, w2, bias), file=sys.stderr)
+            return (False, count)
+
         # Success, this is a sync
-        self.samples.invert = invert
-        length = self.samples.toFrames(count / 2)
+        length = self.samples.toTStates(count / 2)
         if self.debug >= 3:
-            print('   {} @{:n}~{:n} {} {} {}'.format(tag, self.lastPulse, self.lastPulse + count, mma[0], mma[1], mma[2]), file=sys.stderr)
+            print('   {} {:5d} @{:n}~{:n}'.format(tag, length, self.lastPulse, self.lastPulse + count), file=sys.stderr)
         self.samples.advance(count)
         return length
 
@@ -233,7 +245,7 @@ class TapeLoader():
         self.samples.ensure()
 
         # Convert to samples
-        frames = self.samples.toFrames(tCycles) * 2
+        frames = self.samples.toFrames(tCycles * 2)
         (minv, maxv, bias) = self.samples.minMaxAvg(frames)
 
         # Is amplitude above treshold?
@@ -245,30 +257,51 @@ class TapeLoader():
                         self.treshold), file=sys.stderr)
             return None
 
-        # Is it a full wave?
-        if not (self.samples[frames // 4] < bias and self.samples[frames * 3 // 4] > bias):
-            if self.debug >= 4:
-                print(' ! {} not a full wave, lo={} hi={} bias={}'.format(
-                        tag,
-                        self.samples[frames // 4],
-                        self.samples[frames * 3 // 4],
-                        bias), file=sys.stderr)
+        # Find next zero crossing
+        count = self._findZeroCrossing(frames, bias, tag)
+        if not count:
             return None
 
-        # Find next zero crossing
-        count = frames * 3 // 4
-        while self.samples[count] > bias:
-            count += 1
-            limit = int(frames * self.tolerance)
-            if count >= limit:
-                if self.debug >= 4:
-                    print(' ! {} no wave end in range, bias={} limit={}'.format(tag, bias, limit), file=sys.stderr)
-                return (False, frames)
+        # Integrate both half waves
+        countHalf = count // 2
+        w1 = sum([self.samples[i] for i in range(0, countHalf)]) / countHalf
+        w2 = sum([self.samples[i] for i in range(countHalf, count)]) / countHalf
+
+        # Is it a full wave?
+        if not (w1 < bias and w2 > bias and abs(w2 - w1) >= self.treshold):
+            if self.debug >= 4:
+                print(' ! {} not a full wave, w1={} w2={} bias={}'.format(tag, w1, w2, bias), file=sys.stderr)
+            return (False, count)
 
         # Success, this is a bit
-        if self.debug >= 3:
-            print('   {} @{:n}~{:n}'.format(tag, self.lastPulse, self.lastPulse + count), file=sys.stderr)
         return (True, count)
+
+    def _advance(self, bit, count, tag=''):
+        self.samples.advance(count)
+        if self.debug >= 3:
+            length = self.samples.toTStates(count / 2)
+            print('   {} {:5d} @{:n}~{:n} {}'.format(1 if bit else 0, length, self.lastPulse, self.lastPulse + count, tag), file=sys.stderr)
+
+    def _findZeroCrossing(self, frames, bias, tag):
+        count = frames
+        countL = int(frames / self.tolerance)
+        countH = int(frames * self.tolerance)
+
+        while self.samples[count] <= bias:
+            count -= 1
+            if count < countL:
+                if self.debug >= 4:
+                    print(' ! {} no zero crossing detected, count={}, bias={}'.format(tag, count, bias), file=sys.stderr)
+                return None
+
+        while self.samples[count] > bias:
+            count += 1
+            if count > countH:
+                if self.debug >= 4:
+                    print(' ! {} no wave end in range, count={}, bias={}'.format(tag, count, bias), file=sys.stderr)
+                return None
+
+        return count
 
     def _showBlock(self, tap, leaderPos, syncPos, endPos):
         if isinstance(tap, TapHeader):
