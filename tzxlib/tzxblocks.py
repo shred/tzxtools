@@ -66,7 +66,7 @@ class TzxbBlock():
 
     def read(self, tzx):
         self.data = tzx.read(0x04)
-        len = unpack('<L', self.data)
+        len = unpack('<L', self.data)[0]
         self.data += tzx.read(len)
 
     def write(self, tzx):
@@ -196,7 +196,7 @@ class TzxbC64Data(TzxbBlock): # deprecated
 
     def read(self, tzx):
         self.data = tzx.read(0x04)
-        len = unpack('<L', self.data)
+        len = unpack('<L', self.data)[0]
         self.data += tzx.read(len - 4)
 
 
@@ -206,7 +206,7 @@ class TzxbC64TurboData(TzxbBlock): # deprecated
 
     def read(self, tzx):
         self.data = tzx.read(0x04)
-        len = unpack('<L', self.data)
+        len = unpack('<L', self.data)[0]
         self.data += tzx.read(len - 4)
 
 
@@ -240,7 +240,7 @@ class TzxbGroupStart(TzxbBlock):
 
     def read(self, tzx):
         self.data = tzx.read(0x01)
-        len = unpack('<B', self.data)
+        len = unpack('<B', self.data)[0]
         self.data += tzx.read(len)
 
 
@@ -282,7 +282,7 @@ class TzxbCallSequence(TzxbBlock):
 
     def read(self, tzx):
         self.data = tzx.read(0x02)
-        len = unpack('<H', self.data)
+        len = unpack('<H', self.data)[0]
         self.data += tzx.read(len * 2)
 
 
@@ -300,7 +300,7 @@ class TzxbSelect(TzxbBlock):
 
     def read(self, tzx):
         self.data = tzx.read(0x02)
-        len = unpack('<H', self.data)
+        len = unpack('<H', self.data)[0]
         self.data += tzx.read(len)
 
 
@@ -320,7 +320,7 @@ class TzxbTextDescription(TzxbBlock):
 
     def read(self, tzx):
         self.data = tzx.read(0x01)
-        len = unpack('<B', self.data)
+        len = unpack('<B', self.data)[0]
         self.data += tzx.read(len)
 
 
@@ -330,7 +330,7 @@ class TzxbMessage(TzxbBlock):
 
     def read(self, tzx):
         self.data = tzx.read(0x02)
-        len = unpack('<xB', self.data)
+        len = unpack('<xB', self.data)[0]
         self.data += tzx.read(len)
 
 
@@ -340,7 +340,7 @@ class TzxbArchiveInfo(TzxbBlock):
 
     def read(self, tzx):
         self.data = tzx.read(0x02)
-        len = unpack('<H', self.data)
+        len = unpack('<H', self.data)[0]
         self.data += tzx.read(len)
 
 
@@ -350,7 +350,7 @@ class TzxbHardwareType(TzxbBlock):
 
     def read(self, tzx):
         self.data = tzx.read(0x01)
-        len = unpack('<B', self.data)
+        len = unpack('<B', self.data)[0]
         self.data += tzx.read(len * 3)
 
 
@@ -368,7 +368,7 @@ class TzxbCustomInfo(TzxbBlock):
 
     def read(self, tzx):
         self.data = tzx.read(0x14)
-        len = unpack('<L', self.data[0x10:0x14])
+        len = unpack('<L', self.data[0x10:0x14])[0]
         self.data += tzx.read(len)
 
 
