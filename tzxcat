@@ -2,7 +2,7 @@
 #
 # tzxtools - a collection for processing tzx files
 #
-# Copyright (C) 2016 Richard "Shred" Körber
+# Copyright (C) 2018 Richard "Shred" Körber
 #   https://github.com/shred/tzxtools
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,16 +24,19 @@ import sys
 
 from tzxlib.tzxfile import TzxFile
 from tzxlib.convert import convertToText
+from tzxlib.convert import convertToBasic
 
-def writeBlock(out, block, index, convert):
+def writeBlock(out, block, index, convert, basic):
     if not block.tap.valid():
         print('Warning: Block %d has bad CRC' % (index), file=sys.stderr)
-    if convert:
+    if basic:
+        out.write(convertToBasic(block.tap.body()).encode('utf-8'))
+    elif convert:
         out.write(convertToText(block.tap.body()).encode('utf-8'))
     else:
         block.tap.writeBody(out)
 
-def writeSingleBlock(tzx, out, index, convert):
+def writeSingleBlock(tzx, out, index, convert, basic):
     if index < 0 or index >= len(tzx.blocks):
         print('Error: Block %d out of range' % (index), file=sys.stderr)
         exit(1)
@@ -41,13 +44,13 @@ def writeSingleBlock(tzx, out, index, convert):
     if not hasattr(b, 'tap'):
         print('Error: Block %d has no data content' % (index), file=sys.stderr)
         exit(1)
-    writeBlock(out, b, index, convert)
+    writeBlock(out, b, index, convert, basic)
 
-def writeAllBlocks(tzx, out, convert):
+def writeAllBlocks(tzx, out, convert, basic):
     cnt = 0
     for b in tzx.blocks:
         if hasattr(b, 'tap'):
-            writeBlock(out, b, cnt, convert)
+            writeBlock(out, b, cnt, convert, basic)
         cnt += 1
 
 parser = argparse.ArgumentParser(description='Write data block content')
@@ -69,6 +72,10 @@ parser.add_argument('-t', '--text',
             dest='text',
             action='store_true',
             help='convert ZX Spectrum text to UTF-8')
+parser.add_argument('-B', '--basic',
+            dest='basic',
+            action='store_true',
+            help='convert ZX Spectrum BASIC to UTF-8 text')
 args = parser.parse_args()
 
 file = TzxFile()
@@ -76,6 +83,6 @@ file.read(args.file or '/dev/stdin')
 
 with open(args.to, 'wb') as out:
     if args.block != None:
-        writeSingleBlock(file, out, args.block, args.text)
+        writeSingleBlock(file, out, args.block, args.text, args.basic)
     else:
-        writeAllBlocks(file, out, args.text)
+        writeAllBlocks(file, out, args.text, args.basic)
