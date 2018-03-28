@@ -21,16 +21,24 @@
 
 import argparse
 import os.path
+import re
 import sys
 
 from tzxlib.tapfile import TapHeader
 from tzxlib.tzxfile import TzxFile
 
+unwanted = re.compile(r'[^a-zA-Z0-9 #$%,;=@_{}()+-]')
+
+def sanitize(name):
+    if len(name) == 0:
+        return 'no-name'
+    return unwanted.sub('_', name)
+
 def writeTzx(tzx, name, dir):
     if tzx is None or len(tzx.blocks) == 0: return # do not write empty TZX files
     count = 1
     while True:
-        fn = '%s%s-%03d.tzx' % (dir, name, count)
+        fn = '%s%s-%03d.tzx' % (dir, sanitize(name), count)
         if not os.path.isfile(fn): break
         count += 1
     tzx.write(fn)
@@ -70,7 +78,6 @@ for b in file.blocks:
         writeTzx(fout, fname, dir)
         fout = TzxFile()
         fname = b.tap.name().strip()
-        if len(fname) == 0: fname = 'no-name'
     if not fout is None:
         fout.blocks.append(b)
 
