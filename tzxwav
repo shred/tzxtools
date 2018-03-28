@@ -109,7 +109,10 @@ loader = TapeLoader(debug=args.debug,
 
 try:
     tzx = loader.load(args.file, startFrame=args.start, endFrame=args.end)
-    tzx.write(args.to)
+    file = args.to
+    if not file.lower().endswith('.tzx'):
+        file += '.tzx'
+    tzx.write(file)
 except KeyboardInterrupt:
     print("D BREAK - CONT repeats, 0:1", file=sys.stderr)
     exit(1)
