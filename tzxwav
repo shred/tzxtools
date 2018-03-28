@@ -114,6 +114,7 @@ try:
         file += '.tzx'
     tzx.write(file)
 except KeyboardInterrupt:
+    print('', file=sys.stderr)
     print("D BREAK - CONT repeats, 0:1", file=sys.stderr)
     exit(1)
 
