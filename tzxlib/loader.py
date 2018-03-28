@@ -167,7 +167,7 @@ class TapeLoader():
         self.lastPulse = self.samples.position()
 
         # Convert range to samples
-        minRange = self.samples.toFrames(self.leaderT / self.tolerance)
+        minRange = self.samples.toFrames(self.leaderT / ( 2 * self.tolerance))
         maxRange = self.samples.toFrames(self.leaderT * self.tolerance)
 
         # Find end of half pulse
@@ -179,11 +179,6 @@ class TapeLoader():
                 return None
 
         if not (minRange <= count <= maxRange):
-            return None
-
-        # Middle of pulse must be between average and min/max
-        mma = self.samples.minMaxAvg(count)
-        if (startSign >= 0 and self.samples[count // 2] < mma[2]) or (startSign < 0 and self.samples[count // 2] > mma[2]):
             return None
 
         # Compute pulse duration in Z80 T-states
