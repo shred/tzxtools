@@ -226,7 +226,7 @@ class TapeLoader():
         if not (w1 < bias and w2 > bias and abs(w2 - w1) >= self.treshold):
             if self.debug >= 4:
                 print(' ! {} not a full wave, w1={} w2={} bias={}'.format(tag, w1, w2, bias), file=sys.stderr)
-            return (False, count)
+            return None
 
         # Success, this is a sync
         length = self.samples.toTStates(count / 2)
