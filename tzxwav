@@ -26,7 +26,7 @@ import wave
 
 from tzxlib.loader import TapeLoader
 
-tresholds  = { 'low': 500, 'med': 3500, 'high':5000 }
+tresholds  = { 'low': 500, 'med': 2500, 'high':5000 }
 tolerances = { 'low': 1.1,  'med': 1.2,  'high': 1.4 }
 leaderMins = { 'none': 2, 'short': 10, 'normal': 40, 'long': 100 }
 

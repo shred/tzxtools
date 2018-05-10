@@ -104,7 +104,7 @@ class TapeLoader():
                 continue
 
             if len(leaderLengths) >= self.leaderMin:
-                expectedSyncT = (sum(leaderLengths) * self.syncT) / (len(leaderLengths) * self.leaderT)
+                expectedSyncT = 1.1 * (sum(leaderLengths) * self.syncT) / (len(leaderLengths) * self.leaderT)
                 length = self._testSyncPulse(expectedSyncT)
                 if length is not None:
                     # Sync was found
@@ -167,8 +167,8 @@ class TapeLoader():
         self.lastPulse = self.samples.position()
 
         # Convert range to samples
-        minRange = self.samples.toFrames(self.leaderT / ( 2 * self.tolerance))
-        maxRange = self.samples.toFrames(self.leaderT * self.tolerance)
+        minRange = self.samples.toFrames(self.leaderT / ( 1.3 * self.tolerance))
+        maxRange = self.samples.toFrames(self.leaderT * ( 1.1 * self.tolerance))
 
         # Find end of half pulse
         startSign = sgn(self.samples[0])
@@ -223,7 +223,7 @@ class TapeLoader():
         w2 = sum([self.samples[i] for i in range(countHalf, count)]) / countHalf
 
         # Is it a full wave?
-        if not (w1 < bias and w2 > bias and abs(w2 - w1) >= self.treshold):
+        if not (w1 < bias and w2 > bias and abs(w2 - w1) >= self.treshold / 2):
             if self.debug >= 4:
                 print(' ! {} not a full wave, w1={} w2={} bias={}'.format(tag, w1, w2, bias), file=sys.stderr)
             return None
