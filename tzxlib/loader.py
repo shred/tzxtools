@@ -33,9 +33,9 @@ def sgn(val):
 def unpackMono(data, size):
     return unpack('<' + size, data)[0]
 
-def unpackStereo(data, size):
+def unpackStereo(data, size, leftMix = 0.5):
     val = unpack('<' + size + size, data)
-    return (val[0] + val[1]) / 2
+    return (val[0] * leftMix + val[1] * (1 - leftMix))
 
 class TapeLoader():
 
@@ -46,9 +46,9 @@ class TapeLoader():
     lowT    =  855      # 0 bit pulse
     highT   = 1710      # 1 bit pulse
 
-    def __init__(self, progress=None, debug=None, verbose=False, treshold=3500, tolerance=1.2, leaderMin=20, cpufreq=3500000):
+    def __init__(self, progress=None, debug=None, verbose=False, treshold=3500, tolerance=1.2, leaderMin=20, cpufreq=3500000, leftChMix=0.5):
         maxlenT = self.leaderT * 2.2 * tolerance
-        self.samples = TapeReader(progress=progress, cpufreq=cpufreq, maxlenT=maxlenT)
+        self.samples = TapeReader(progress=progress, cpufreq=cpufreq, maxlenT=maxlenT, leftChMix=leftChMix)
         self.debug = debug if debug is not None else 0
         self.verbose = verbose
         self.treshold = treshold
@@ -317,13 +317,14 @@ class TapeLoader():
 
 
 class TapeReader():
-    def __init__(self, progress=None, cpufreq=3500000, maxlenT=6000):
+    def __init__(self, progress=None, cpufreq=3500000, maxlenT=6000, leftChMix=0.5):
         self.cpufreq = cpufreq
         self.progress = progress
         self.maxlenT = maxlenT
         self.invert = False
         self.startFrame = None
         self.endFrame = None
+        self.leftChMix = leftChMix
 
     def open(self, filename):
         """ Opens the given WAV file name """
@@ -423,11 +424,11 @@ class TapeReader():
         channels = self.wav.getnchannels()
         bpc = self.wav.getsampwidth()
         if bpc == 2:
-            if channels == 2:   return lambda f: unpackStereo(f, 'h')
+            if channels == 2:   return lambda f: unpackStereo(f, 'h', self.leftChMix)
             elif channels == 1: return lambda f: unpackMono(f, 'h')
             else:               raise IOError('Cannot handle WAV files with {} channels'.format(channels))
         elif bpc == 1:
-            if channels == 2:   return lambda f: unpackStereo(f, 'b') * 256
+            if channels == 2:   return lambda f: unpackStereo(f, 'b', self.leftChMix) * 256
             elif channels == 1: return lambda f: unpackMono(f, 'b') * 256
             else:               raise IOError('Cannot handle WAV files with {} channels'.format(channels))
         else:

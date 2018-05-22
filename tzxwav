@@ -29,6 +29,7 @@ from tzxlib.loader import TapeLoader
 tresholds  = { 'low': 500, 'med': 2500, 'high':5000 }
 tolerances = { 'low': 1.1,  'med': 1.2,  'high': 1.4 }
 leaderMins = { 'none': 2, 'short': 10, 'normal': 40, 'long': 100 }
+leftChMix = { 'left': 1,  'mix': 0.5,  'right': 0 }
 
 lastPercent = None
 startTime = None
@@ -92,6 +93,11 @@ parser.add_argument('-e', '--end',
             dest='end',
             type=int,
             help='End at WAV frame number')
+parser.add_argument('-S', '--stereo',
+            choices=['left', 'mix', 'right'],
+            default='mix',
+            dest='leftChMix',
+            help='channel selection (works only for stereo WAV files)')
 parser.add_argument('-D', '--debug',
             dest='debug',
             action='count',
@@ -103,6 +109,7 @@ loader = TapeLoader(debug=args.debug,
         treshold=tresholds[args.treshold],
         tolerance=tolerances[args.tolerance],
         leaderMin=leaderMins[args.leader],
+        leftChMix=leftChMix[args.leftChMix],
         cpufreq=args.clock,
         progress=showProgress if args.progress else None,
         verbose=args.verbose)
