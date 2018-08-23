@@ -4,6 +4,8 @@ site_url: https://shredzone.org/docs/tzxtools/index.html
 theme:
     name: material
     font: false
+    logo:
+        icon: 'save'
     palette:
         primary: 'blue'
         accent: 'deep orange'
