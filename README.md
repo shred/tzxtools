@@ -2,15 +2,23 @@
 
 This is a collection of command line tools for processing [TZX](http://www.worldofspectrum.org/TZXformat.html) files. TZX is a common file format for preserving computer tapes of the ZX Spectrum, but also Amstrad CPC and C64. All the _tzxtools_ are witten in Python 3.
 
-## The Tools
+## Installation
 
-* [`tzxcat`](docs/tzxcat.md): Extracts file data from a TZX file
-* [`tzxcleanup`](docs/tzxcleanup.md): Removes all clutter and leaves a clean tape file
-* [`tzxcut`](docs/tzxcut.md): Cuts blocks from a TZX file
-* [`tzxls`](docs/tzxls.md): Shows the contents of a TZX file
-* [`tzxmerge`](docs/tzxmerge.md): Concatenates multiple TZX files into one file
-* [`tzxsplit`](docs/tzxsplit.md): Splits a TZX file into separate programs
-* [`tzxwav`](docs/tzxwav.md): Converts WAV file tape recordings to TZX files
+```sh
+pip install tzxtools
+```
+
+## Tools
+
+* `tzxcat` - Extracts file data from a TZX file
+* `tzxcleanup` - Removes all clutter and leaves a clean tape file
+* `tzxcut` - Cuts blocks from a TZX file
+* `tzxls` - Shows the contents of a TZX file
+* `tzxmerge` - Concatenates multiple TZX files into one file
+* `tzxsplit` - Splits a TZX file into separate programs
+* `tzxwav` - Converts WAV file tape recordings to TZX files
+
+See the [documentation](https://shredzone.org/docs/tzxtools/index.html) for how the tools are used.
 
 ## Contribute
 

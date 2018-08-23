@@ -1,0 +1,18 @@
+site_name: tzxtools
+site_author: Richard Körber
+site_url: https://shredzone.org/docs/tzxtools/index.html
+theme:
+    name: material
+    font: false
+    palette:
+        primary: 'blue'
+        accent: 'deep orange'
+pages:
+  - 'Installation': 'index.md'
+  - 'tzxcat': 'tzxcat.md'
+  - 'tzxcleanup': 'tzxcleanup.md'
+  - 'tzxcut': 'tzxcut.md'
+  - 'tzxls': 'tzxls.md'
+  - 'tzxmerge': 'tzxmerge.md'
+  - 'tzxsplit': 'tzxsplit.md'
+  - 'tzxwav': 'tzxwav.md'
