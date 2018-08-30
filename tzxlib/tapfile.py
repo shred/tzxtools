@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from struct import unpack
+from struct import pack, unpack
 
 from tzxlib.convert import convert
 
@@ -42,6 +42,10 @@ class TapFile():
         out.write(self.body())
 
     def write(self, tzx):
+        tzx.write(self.data)
+
+    def writeFragment(self, tzx):
+        tzx.write(pack('<H', len(self.data)))
         tzx.write(self.data)
 
 

@@ -67,6 +67,7 @@ setup(
             'tzxls=tzxtools.tzxls:main',
             'tzxmerge=tzxtools.tzxmerge:main',
             'tzxsplit=tzxtools.tzxsplit:main',
+            'tzxtap=tzxtools.tzxtap:main',
             'tzxwav=tzxtools.tzxwav:main',
         ],
     },

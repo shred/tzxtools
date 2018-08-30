@@ -16,6 +16,7 @@ pip install tzxtools
 * [`tzxls`](tzxls.md) - Shows the contents of a TZX file
 * [`tzxmerge`](tzxmerge.md) - Concatenates multiple TZX files into one file
 * [`tzxsplit`](tzxsplit.md) - Splits a TZX file into separate programs
+* [`tzxtap`](tzxtap.md) - Converts a TZX file to a TAP file
 * [`tzxwav`](tzxwav.md) - Converts WAV file tape recordings to TZX files
 
 ## Open Source

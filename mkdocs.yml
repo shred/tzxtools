@@ -17,4 +17,5 @@ pages:
   - 'tzxls': 'tzxls.md'
   - 'tzxmerge': 'tzxmerge.md'
   - 'tzxsplit': 'tzxsplit.md'
+  - 'tzxtap': 'tzxtap.md'
   - 'tzxwav': 'tzxwav.md'
