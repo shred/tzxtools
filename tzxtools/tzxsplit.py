@@ -43,42 +43,42 @@ def writeTzx(tzx, name, dir):
         count += 1
     tzx.write(fn)
 
+def main():
+    parser = argparse.ArgumentParser(description='Split into separate programs')
+    parser.add_argument('file',
+                nargs='?',
+                default='/dev/stdin',
+                help='TZX file, stdin if omitted')
+    parser.add_argument('-d', '--dir',
+                dest='dir',
+                metavar='TARGET',
+                default='./',
+                help='target directory, default is cwd')
+    parser.add_argument('-1', '--single',
+                dest='single',
+                action='store_true',
+                help='split into single loadable files')
+    parser.add_argument('-s', '--skip',
+                dest='skip',
+                action='store_true',
+                help='skip all blocks before first Program')
+    args = parser.parse_args()
 
-parser = argparse.ArgumentParser(description='Split into separate programs')
-parser.add_argument('file',
-            nargs='?',
-            default='/dev/stdin',
-            help='TZX file, stdin if omitted')
-parser.add_argument('-d', '--dir',
-            dest='dir',
-            metavar='TARGET',
-            default='./',
-            help='target directory, default is cwd')
-parser.add_argument('-1', '--single',
-            dest='single',
-            action='store_true',
-            help='split into single loadable files')
-parser.add_argument('-s', '--skip',
-            dest='skip',
-            action='store_true',
-            help='skip all blocks before first Program')
-args = parser.parse_args()
+    file = TzxFile()
+    file.read(args.file)
 
-file = TzxFile()
-file.read(args.file)
+    dir = args.dir
+    if dir[-1] != '/': dir += '/'
 
-dir = args.dir
-if dir[-1] != '/': dir += '/'
+    fname = 'preamble'
+    fout = TzxFile() if not args.skip else None
 
-fname = 'preamble'
-fout = TzxFile() if not args.skip else None
+    for b in file.blocks:
+        if hasattr(b, 'tap') and isinstance(b.tap, TapHeader) and (b.tap.typeId() == 0 or args.single):
+            writeTzx(fout, fname, dir)
+            fout = TzxFile()
+            fname = b.tap.name().strip()
+        if not fout is None:
+            fout.blocks.append(b)
 
-for b in file.blocks:
-    if hasattr(b, 'tap') and isinstance(b.tap, TapHeader) and (b.tap.typeId() == 0 or args.single):
-        writeTzx(fout, fname, dir)
-        fout = TzxFile()
-        fname = b.tap.name().strip()
-    if not fout is None:
-        fout.blocks.append(b)
-
-writeTzx(fout, fname, dir)
+    writeTzx(fout, fname, dir)

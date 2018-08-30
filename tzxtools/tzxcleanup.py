@@ -24,59 +24,60 @@ import sys
 
 from tzxlib.tzxfile import TzxFile
 
-parser = argparse.ArgumentParser(description='Remove all noise, idealize the data')
-parser.add_argument('file',
-            nargs='?',
-            default='/dev/stdin',
-            help='TZX file, stdin if omitted')
-parser.add_argument('-o',
-            '--to',
-            dest='to',
-            metavar='TARGET',
-            default='/dev/stdout',
-            help='target TZX file, stdout if omitted')
-parser.add_argument('-c',
-            '--stripcrc',
-            dest='stripcrc',
-            action='store_true',
-            help='also remove blocks with bad CRC')
-args = parser.parse_args()
+def main():
+    parser = argparse.ArgumentParser(description='Remove all noise, idealize the data')
+    parser.add_argument('file',
+                nargs='?',
+                default='/dev/stdin',
+                help='TZX file, stdin if omitted')
+    parser.add_argument('-o',
+                '--to',
+                dest='to',
+                metavar='TARGET',
+                default='/dev/stdout',
+                help='target TZX file, stdout if omitted')
+    parser.add_argument('-c',
+                '--stripcrc',
+                dest='stripcrc',
+                action='store_true',
+                help='also remove blocks with bad CRC')
+    args = parser.parse_args()
 
-fout = TzxFile()
-crcCnt = 0
-noiseCnt = 0
+    fout = TzxFile()
+    crcCnt = 0
+    noiseCnt = 0
 
-file = TzxFile()
-file.read(args.file)
-for b in file.blocks:
-    # Convert Turbo blocks to standard timed blocks if possible
-    if b.id in [0x11, 0x14]:
-        o = b.asData()
+    file = TzxFile()
+    file.read(args.file)
+    for b in file.blocks:
+        # Convert Turbo blocks to standard timed blocks if possible
+        if b.id in [0x11, 0x14]:
+            o = b.asData()
 
-    # Use all data blocks for the output
-    if b.id in [0x10, 0x11, 0x14]:
-        if not b.valid():
-            crcCnt += 1
-        if b.valid() or not args.stripcrc:
+        # Use all data blocks for the output
+        if b.id in [0x10, 0x11, 0x14]:
+            if not b.valid():
+                crcCnt += 1
+            if b.valid() or not args.stripcrc:
+                fout.blocks.append(b)
+            continue
+
+        # Use all pause blocks if they mean "stop the tape"
+        if b.id in [0x20, 0x2A]:
+            if b.id != 0x20 or b.length() == 0:
+                fout.blocks.append(b)
+            continue
+
+        # Use all meta blocks
+        if b.id not in [0x12, 0x13, 0x15, 0x18, 0x19]:
             fout.blocks.append(b)
-        continue
+            continue
 
-    # Use all pause blocks if they mean "stop the tape"
-    if b.id in [0x20, 0x2A]:
-        if b.id != 0x20 or b.length() == 0:
-            fout.blocks.append(b)
-        continue
+        noiseCnt += 1
 
-    # Use all meta blocks
-    if b.id not in [0x12, 0x13, 0x15, 0x18, 0x19]:
-        fout.blocks.append(b)
-        continue
+    fout.write(args.to)
 
-    noiseCnt += 1
-
-fout.write(args.to)
-
-print('Blocks found:           %3d' % (len(file.blocks)), file=sys.stderr)
-print('Noise blocks removed:   %3d' % (noiseCnt), file=sys.stderr)
-print('Blocks with CRC errors: %3d' % (crcCnt), file=sys.stderr)
-print('Blocks written:         %3d' % (len(fout.blocks)), file=sys.stderr)
+    print('Blocks found:           %3d' % (len(file.blocks)), file=sys.stderr)
+    print('Noise blocks removed:   %3d' % (noiseCnt), file=sys.stderr)
+    print('Blocks with CRC errors: %3d' % (crcCnt), file=sys.stderr)
+    print('Blocks written:         %3d' % (len(fout.blocks)), file=sys.stderr)

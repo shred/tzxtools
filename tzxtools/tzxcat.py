@@ -53,36 +53,37 @@ def writeAllBlocks(tzx, out, convert, basic):
             writeBlock(out, b, cnt, convert, basic)
         cnt += 1
 
-parser = argparse.ArgumentParser(description='Write data block content')
-parser.add_argument('file',
-            nargs='?',
-            default='/dev/stdin',
-            help='TZX file, stdin if omitted')
-parser.add_argument('-b', '--block',
-            dest='block',
-            type=int,
-            metavar='NR',
-            help='block number to cat')
-parser.add_argument('-o', '--to',
-            dest='to',
-            metavar='TARGET',
-            default='/dev/stdout',
-            help='target file, stdout if omitted')
-parser.add_argument('-t', '--text',
-            dest='text',
-            action='store_true',
-            help='convert ZX Spectrum text to UTF-8')
-parser.add_argument('-B', '--basic',
-            dest='basic',
-            action='store_true',
-            help='convert ZX Spectrum BASIC to UTF-8 text')
-args = parser.parse_args()
+def main():
+    parser = argparse.ArgumentParser(description='Write data block content')
+    parser.add_argument('file',
+                nargs='?',
+                default='/dev/stdin',
+                help='TZX file, stdin if omitted')
+    parser.add_argument('-b', '--block',
+                dest='block',
+                type=int,
+                metavar='NR',
+                help='block number to cat')
+    parser.add_argument('-o', '--to',
+                dest='to',
+                metavar='TARGET',
+                default='/dev/stdout',
+                help='target file, stdout if omitted')
+    parser.add_argument('-t', '--text',
+                dest='text',
+                action='store_true',
+                help='convert ZX Spectrum text to UTF-8')
+    parser.add_argument('-B', '--basic',
+                dest='basic',
+                action='store_true',
+                help='convert ZX Spectrum BASIC to UTF-8 text')
+    args = parser.parse_args()
 
-file = TzxFile()
-file.read(args.file or '/dev/stdin')
+    file = TzxFile()
+    file.read(args.file or '/dev/stdin')
 
-with open(args.to, 'wb') as out:
-    if args.block != None:
-        writeSingleBlock(file, out, args.block, args.text, args.basic)
-    else:
-        writeAllBlocks(file, out, args.text, args.basic)
+    with open(args.to, 'wb') as out:
+        if args.block != None:
+            writeSingleBlock(file, out, args.block, args.text, args.basic)
+        else:
+            writeAllBlocks(file, out, args.text, args.basic)

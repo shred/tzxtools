@@ -24,28 +24,29 @@ import argparse
 from tzxlib.tapfile import TapHeader
 from tzxlib.tzxfile import TzxFile
 
-parser = argparse.ArgumentParser(description='List the contents of a TZX file')
-parser.add_argument('file',
-            nargs='*',
-            help='TZX files, stdin if omitted')
-parser.add_argument('-s', '--short',
-            dest='short',
-            action='store_true',
-            help='list only the ZX Spectrum header names')
-args = parser.parse_args()
+def main():
+    parser = argparse.ArgumentParser(description='List the contents of a TZX file')
+    parser.add_argument('file',
+                nargs='*',
+                help='TZX files, stdin if omitted')
+    parser.add_argument('-s', '--short',
+                dest='short',
+                action='store_true',
+                help='list only the ZX Spectrum header names')
+    args = parser.parse_args()
 
-for f in args.file if len(args.file) > 0 else ['/dev/stdin']:
-    if len(args.file) > 1:
-        print('\n%s:' % (f))
+    for f in args.file if len(args.file) > 0 else ['/dev/stdin']:
+        if len(args.file) > 1:
+            print('\n%s:' % (f))
 
-    tzx = TzxFile()
-    tzx.read(f)
+        tzx = TzxFile()
+        tzx.read(f)
 
-    cnt = 0
-    for b in tzx.blocks:
-        if args.short:
-            if hasattr(b, 'tap') and isinstance(b.tap, TapHeader):
-                print('%s: %s' % (b.tap.type(), b.tap.name()))
-        else:
-            print('%3d  %-27s %s' % (cnt, b.type, str(b)))
-        cnt += 1
+        cnt = 0
+        for b in tzx.blocks:
+            if args.short:
+                if hasattr(b, 'tap') and isinstance(b.tap, TapHeader):
+                    print('%s: %s' % (b.tap.type(), b.tap.name()))
+            else:
+                print('%3d  %-27s %s' % (cnt, b.type, str(b)))
+            cnt += 1

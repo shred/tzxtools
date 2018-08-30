@@ -23,21 +23,22 @@ import argparse
 
 from tzxlib.tzxfile import TzxFile
 
-parser = argparse.ArgumentParser(description='Merges TZX files')
-parser.add_argument('files',
-            nargs='+',
-            help='TZX files to merge')
-parser.add_argument('-o', '--to',
-            metavar='TARGET',
-            default='/dev/stdout',
-            help='target TZX file, stdout if omitted')
-args = parser.parse_args()
+def main():
+    parser = argparse.ArgumentParser(description='Merges TZX files')
+    parser.add_argument('files',
+                nargs='+',
+                help='TZX files to merge')
+    parser.add_argument('-o', '--to',
+                metavar='TARGET',
+                default='/dev/stdout',
+                help='target TZX file, stdout if omitted')
+    args = parser.parse_args()
 
-file = TzxFile()
+    file = TzxFile()
 
-for f in args.files:
-    mergeFile = TzxFile()
-    mergeFile.read(f)
-    file.blocks.extend(mergeFile.blocks)
+    for f in args.files:
+        mergeFile = TzxFile()
+        mergeFile.read(f)
+        file.blocks.extend(mergeFile.blocks)
 
-file.write(args.to)
+    file.write(args.to)
