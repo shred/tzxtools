@@ -16,6 +16,7 @@ pip install tzxtools
 * `tzxls` - Shows the contents of a TZX file
 * `tzxmerge` - Concatenates multiple TZX files into one file
 * `tzxsplit` - Splits a TZX file into separate programs
+* `tzxtap` - Converts a TZX file to TAP file format
 * `tzxwav` - Converts WAV file tape recordings to TZX files
 
 See the [documentation](https://shredzone.org/docs/tzxtools/index.html) for how the tools are used.
