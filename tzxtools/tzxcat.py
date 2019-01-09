@@ -26,6 +26,7 @@ from tzxlib.tzxfile import TzxFile
 from tzxlib.convert import convertToText
 from tzxlib.convert import convertToBasic
 from tzxlib.convert import convertToDump
+from tzxlib.convert import convertToAssembler
 
 def writeBlock(out, block, converter, skip, length):
     data = block.tap.body()
@@ -92,6 +93,11 @@ def main():
                 dest='basic',
                 action='store_true',
                 help='convert ZX Spectrum BASIC to UTF-8 text')
+    parser.add_argument('-A', '--assembler',
+                dest='assembler',
+                type=int,
+                metavar='ORG',
+                help='disassemble block, using the given base address')
     parser.add_argument('-d', '--dump',
                 dest='dump',
                 action='store_true',
@@ -104,6 +110,8 @@ def main():
     converter = None
     if args.basic:
         converter = lambda data : convertToBasic(data).encode('utf-8')
+    elif args.assembler:
+        converter = lambda data : convertToAssembler(data, args.assembler).encode('utf-8')
     elif args.text:
         converter = lambda data: convertToText(data).encode('utf-8')
     elif args.dump:

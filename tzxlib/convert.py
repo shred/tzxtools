@@ -20,6 +20,7 @@
 #
 
 from struct import unpack
+from tzxlib.z80dis import disassemble
 
 UPPER = [ ' ', '▝', '▘', '▀', '▗', '▐', '▚', '▜', '▖', '▞', '▌', '▛', '▄', '▟',
     '▙', '█', 'Ⓐ', 'Ⓑ', 'Ⓒ', 'Ⓓ', 'Ⓔ', 'Ⓕ', 'Ⓖ', 'Ⓗ', 'Ⓘ', 'Ⓙ', 'Ⓚ',
@@ -101,7 +102,7 @@ def convertToDump(data, bytesPerRow=16):
     while pos < end:
         result += '%04X | ' % (pos)
         text = ''
-        for x in range(0, bytesPerRow):
+        for x in range(bytesPerRow):
             if pos + x < end:
                 result += '%02X ' % (data[pos + x])
                 ch = data[pos + x]
@@ -119,4 +120,25 @@ def convertToDump(data, bytesPerRow=16):
         result += text
         result += '\n'
         pos += bytesPerRow
+    return result
+
+def convertToAssembler(data, org=0):
+    result = ''
+    pos = 0
+    end = len(data)
+    while pos < end:
+        try:
+            (ins, length) = disassemble(data, pos, org)
+        except:
+            (ins, length) = ('???', 1)
+        result += '%04X  ' % (pos + org)
+        for x in range(6):
+            if x < length:
+                result += '%02X ' % (data[pos + x])
+            else:
+                result += '   '
+        result += ' '
+        result += ins
+        result += '\n'
+        pos += length
     return result
