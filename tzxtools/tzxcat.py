@@ -23,19 +23,20 @@ import argparse
 import sys
 
 from tzxlib.tzxfile import TzxFile
+from tzxlib.tapfile import TapHeader
 from tzxlib.convert import convertToText
 from tzxlib.convert import convertToBasic
 from tzxlib.convert import convertToDump
 from tzxlib.convert import convertToAssembler
 
-def writeBlock(out, block, converter, skip, length):
+def writeBlock(out, block, converter, skip, length, org):
     data = block.tap.body()
     if skip:
         data = data[skip:]
     if length:
         data = data[:length]
     if converter:
-        data = converter(data)
+        data = converter(data, org)
     out.write(data)
 
 def writeSingleBlock(tzx, out, index, writer):
@@ -48,7 +49,7 @@ def writeSingleBlock(tzx, out, index, writer):
         exit(1)
     if not b.tap.valid():
         print('Warning: Block %d has bad CRC' % (index), file=sys.stderr)
-    writer(out, b)
+    writer(out, b, findOrg(tzx, index))
 
 def writeAllBlocks(tzx, out, writer):
     cnt = 0
@@ -56,8 +57,16 @@ def writeAllBlocks(tzx, out, writer):
         if hasattr(b, 'tap'):
             if not b.tap.valid():
                 print('Warning: Block %d has bad CRC' % (cnt), file=sys.stderr)
-            writer(out, b)
+            writer(out, b, findOrg(tzx, cnt))
         cnt += 1
+
+def findOrg(tzx, index):
+    if index > 1:
+        b = tzx.blocks[index - 1]
+        if hasattr(b, 'tap'):
+            if isinstance(b.tap, TapHeader) and b.tap.typeId() == 3:
+                return b.tap.param1()
+    return None
 
 def main():
     parser = argparse.ArgumentParser(description='Write data block content')
@@ -95,13 +104,17 @@ def main():
                 help='convert ZX Spectrum BASIC to UTF-8 text')
     parser.add_argument('-A', '--assembler',
                 dest='assembler',
-                type=int,
-                metavar='ORG',
-                help='disassemble block, using the given base address')
+                action='store_true',
+                help='disassemble Z80 code')
     parser.add_argument('-d', '--dump',
                 dest='dump',
                 action='store_true',
                 help='convert to a hex dump')
+    parser.add_argument('-O', '--org',
+                dest='org',
+                type=int,
+                metavar='BASE',
+                help='base address for disassembled code')
     args = parser.parse_args()
 
     file = TzxFile()
@@ -109,15 +122,15 @@ def main():
 
     converter = None
     if args.basic:
-        converter = lambda data : convertToBasic(data).encode('utf-8')
+        converter = lambda data, org: convertToBasic(data).encode('utf-8')
     elif args.assembler:
-        converter = lambda data : convertToAssembler(data, args.assembler).encode('utf-8')
+        converter = lambda data, org: convertToAssembler(data, org or 0).encode('utf-8')
     elif args.text:
-        converter = lambda data: convertToText(data).encode('utf-8')
+        converter = lambda data, org: convertToText(data).encode('utf-8')
     elif args.dump:
-        converter = lambda data: convertToDump(data).encode('utf-8')
+        converter = lambda data, org: convertToDump(data).encode('utf-8')
 
-    writer = lambda out, block : writeBlock(out, block, converter, args.skip, args.length)
+    writer = lambda out, block, org : writeBlock(out, block, converter, args.skip, args.length, args.org or org)
 
     with open(args.to, 'wb') as out:
         if args.block != None:
