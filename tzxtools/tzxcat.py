@@ -28,6 +28,7 @@ from tzxlib.convert import convertToText
 from tzxlib.convert import convertToBasic
 from tzxlib.convert import convertToDump
 from tzxlib.convert import convertToAssembler
+from tzxlib.convert import convertToScreen
 
 def writeBlock(out, block, converter, skip, length, org):
     data = block.tap.body()
@@ -36,8 +37,7 @@ def writeBlock(out, block, converter, skip, length, org):
     if length:
         data = data[:length]
     if converter:
-        data = converter(data, org)
-    out.write(data)
+        data = converter(data, out, org)
 
 def writeSingleBlock(tzx, out, index, writer):
     if index < 0 or index >= len(tzx.blocks):
@@ -106,6 +106,10 @@ def main():
                 dest='assembler',
                 action='store_true',
                 help='disassemble Z80 code')
+    parser.add_argument('-S', '--screen',
+                dest='screen',
+                action='store_true',
+                help='convert a ZX Spectrum SCREEN$ to PNG')
     parser.add_argument('-d', '--dump',
                 dest='dump',
                 action='store_true',
@@ -122,13 +126,15 @@ def main():
 
     converter = None
     if args.basic:
-        converter = lambda data, org: convertToBasic(data).encode('utf-8')
+        converter = lambda data, out, org: out.write(convertToBasic(data).encode('utf-8'))
     elif args.assembler:
-        converter = lambda data, org: convertToAssembler(data, org or 0).encode('utf-8')
+        converter = lambda data, out, org: out.write(convertToAssembler(data, org or 0).encode('utf-8'))
+    elif args.screen:
+        converter = lambda data, out, org: convertToScreen(data, out)
     elif args.text:
-        converter = lambda data, org: convertToText(data).encode('utf-8')
+        converter = lambda data, out, org: out.write(convertToText(data).encode('utf-8'))
     elif args.dump:
-        converter = lambda data, org: convertToDump(data).encode('utf-8')
+        converter = lambda data, out, org: out.write(convertToDump(data).encode('utf-8'))
 
     writer = lambda out, block, org : writeBlock(out, block, converter, args.skip, args.length, args.org or org)
 

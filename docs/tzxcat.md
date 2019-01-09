@@ -7,7 +7,7 @@ This tool is useful to migrate tape computer files to modern computers.
 ## Usage
 
 ```
-tzxcat [-h] [-b NR] [-o TARGET] [-s BYTES] [-l BYTES] [-t] [-B] [-A] [-O BASE] [file]
+tzxcat [-h] [-b NR] [-o TARGET] [-s BYTES] [-l BYTES] [-t] [-B] [-A] [-S] [-d] [-O BASE] [file]
 ```
 
 * `file`: TZX file to read from, or `stdin` if not given.
@@ -18,6 +18,7 @@ tzxcat [-h] [-b NR] [-o TARGET] [-s BYTES] [-l BYTES] [-t] [-B] [-A] [-O BASE] [
 * `-t`, `--text`: Convert a ZX Spectrum text to UTF-8 before output.
 * `-B`, `--basic`: Convert ZX Spectrum BASIC to plain UTF-8 text. Inline color changes are ignored.
 * `-A`, `--assembler`: Disassemble the block, using a simple Z80 disassembler. ZX Spectrum Next op codes are supported, but are still subject to change.
+* `-S`, `--screen`: Convert a ZX Spectrum SCREEN$ to PNG.
 * `-d`, `--dump`: Convert a binary to a hex dump.
 * `-O`, `--org`: Define base address for disassembling. If not given, the starting address of the previous CODE header is used.
 * `-h`, `--help`: Show help message and exit.

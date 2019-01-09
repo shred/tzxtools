@@ -59,6 +59,10 @@ setup(
 
     packages=['tzxtools', 'tzxlib'],
 
+    install_requires=[
+        'pypng >= 0.0.18',
+    ],
+
     entry_points={
         'console_scripts': [
             'tzxcat=tzxtools.tzxcat:main',

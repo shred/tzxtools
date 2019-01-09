@@ -144,3 +144,42 @@ def convertToAssembler(data, org=0):
         result += '\n'
         pos += length
     return result
+
+def convertToScreen(data, out):
+    pixel = []
+    for y in range(192):
+        pixrow = []
+        pixel.append(pixrow)
+        for col in range(32):
+            palette = readColor(data, y, col)
+            bits = readBits(data, y, col)
+            for b in range(8):
+                if bits & (0b10000000 >> b):
+                    pixrow.append(palette[0])
+                else:
+                    pixrow.append(palette[1])
+
+    import png
+    pngw = png.Writer(256, 192, palette=PALETTE)
+    pngw.write(out, pixel)
+
+def readBits(data, y, col):
+    block = int(y / 64)
+    line = int((y % 64) / 8)
+    row = y % 8
+    offset = ((((block * 8) + row) * 8) + line) * 32 + col
+    return data[offset] if offset < len(data) else 0
+
+def readColor(data, y, col):
+    row = (int)(y / 8)
+    offset = 6144 + row * 32 + col
+    cols = data[offset] if offset < len(data) else 0b00111000
+    if cols & 0b01000000:
+        return ((cols % 8 & 0x07), (cols >> 3 & 0x07 + 8))
+    else:
+        return ((cols & 0x07), (cols >> 3 & 0x07))
+
+PALETTE = [
+    (0,0,0), (0,0,215), (215,0,0), (215,0,215), (0,215,0), (0,215,215), (215,215,0), (215,215,215),
+    (0,0,0), (0,0,255), (255,0,0), (255,0,255), (0,255,0), (0,255,255), (255,255,0), (255,255,255),
+]
