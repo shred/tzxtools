@@ -133,7 +133,9 @@ def convertToAssembler(data, org=0):
             (ins, length) = ('???', 1)
         result += '%04X  ' % (pos + org)
         for x in range(6):
-            if x < length:
+            if x == 5 and length > 6:
+                result += '...'
+            elif x < length:
                 result += '%02X ' % (data[pos + x])
             else:
                 result += '   '
