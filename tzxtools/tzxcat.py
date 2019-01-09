@@ -26,19 +26,15 @@ from tzxlib.tzxfile import TzxFile
 from tzxlib.convert import convertToText
 from tzxlib.convert import convertToBasic
 
-def writeBlock(out, block, convert, basic, skip, length):
+def writeBlock(out, block, converter, skip, length):
     data = block.tap.body()
     if skip:
         data = data[skip:]
     if length:
         data = data[:length]
-
-    if basic:
-        out.write(convertToBasic(data).encode('utf-8'))
-    elif convert:
-        out.write(convertToText(data).encode('utf-8'))
-    else:
-        out.write(data)
+    if converter:
+        data = converter(data)
+    out.write(data)
 
 def writeSingleBlock(tzx, out, index, writer):
     if index < 0 or index >= len(tzx.blocks):
@@ -100,7 +96,13 @@ def main():
     file = TzxFile()
     file.read(args.file or '/dev/stdin')
 
-    writer = lambda out, block : writeBlock(out, block, args.text, args.basic, args.skip, args.length)
+    converter = None
+    if args.basic:
+        converter = lambda data : convertToBasic(data).encode('utf-8')
+    elif args.text:
+        converter = lambda data: convertToText(data).encode('utf-8')
+
+    writer = lambda out, block : writeBlock(out, block, converter, args.skip, args.length)
 
     with open(args.to, 'wb') as out:
         if args.block != None:
