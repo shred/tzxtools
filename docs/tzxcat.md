@@ -7,12 +7,14 @@ This tool is useful to migrate tape computer files to modern computers.
 ## Usage
 
 ```
-tzxcat [-h] [-b NR] [-o TARGET] [-t] [-B] [file]
+tzxcat [-h] [-b NR] [-o TARGET] [-s BYTES] [-l BYTES] [-t] [-B] [file]
 ```
 
 * `file`: TZX file to read from, or `stdin` if not given.
 * `-o`, `--to`: Target file. If omitted, `stdout` is used.
 * `-b`, `--block`: Only extract the TZX block with the given block number. If omitted, all data blocks are concatenated to a single output stream. This must be a data block. If the block has a bad CRC, a warning is printed, but the content is extracted nevertheless.
+* `-s`, `--skip`: Skip the given number of bytes before output. If omitted, nothing is skipped. If it exceeds the block length, an empty block is written.
+* `-l`, `--length`: Limit the output to the given number of bytes. The rest of the block is written if this parameter is omitted or if it exceeds the block length.
 * `-t`, `--text`: Convert a ZX Spectrum text to UTF-8 before output.
 * `-B`, `--basic`: Convert ZX Spectrum BASIC to plain UTF-8 text. Inline color changes are ignored.
 * `-h`, `--help`: Show help message and exit.

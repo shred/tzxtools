@@ -26,17 +26,21 @@ from tzxlib.tzxfile import TzxFile
 from tzxlib.convert import convertToText
 from tzxlib.convert import convertToBasic
 
-def writeBlock(out, block, index, convert, basic):
-    if not block.tap.valid():
-        print('Warning: Block %d has bad CRC' % (index), file=sys.stderr)
-    if basic:
-        out.write(convertToBasic(block.tap.body()).encode('utf-8'))
-    elif convert:
-        out.write(convertToText(block.tap.body()).encode('utf-8'))
-    else:
-        block.tap.writeBody(out)
+def writeBlock(out, block, convert, basic, skip, length):
+    data = block.tap.body()
+    if skip:
+        data = data[skip:]
+    if length:
+        data = data[:length]
 
-def writeSingleBlock(tzx, out, index, convert, basic):
+    if basic:
+        out.write(convertToBasic(data).encode('utf-8'))
+    elif convert:
+        out.write(convertToText(data).encode('utf-8'))
+    else:
+        out.write(data)
+
+def writeSingleBlock(tzx, out, index, writer):
     if index < 0 or index >= len(tzx.blocks):
         print('Error: Block %d out of range' % (index), file=sys.stderr)
         exit(1)
@@ -44,13 +48,17 @@ def writeSingleBlock(tzx, out, index, convert, basic):
     if not hasattr(b, 'tap'):
         print('Error: Block %d has no data content' % (index), file=sys.stderr)
         exit(1)
-    writeBlock(out, b, index, convert, basic)
+    if not b.tap.valid():
+        print('Warning: Block %d has bad CRC' % (index), file=sys.stderr)
+    writer(out, b)
 
-def writeAllBlocks(tzx, out, convert, basic):
+def writeAllBlocks(tzx, out, writer):
     cnt = 0
     for b in tzx.blocks:
         if hasattr(b, 'tap'):
-            writeBlock(out, b, cnt, convert, basic)
+            if not b.tap.valid():
+                print('Warning: Block %d has bad CRC' % (cnt), file=sys.stderr)
+            writer(out, b)
         cnt += 1
 
 def main():
@@ -69,6 +77,16 @@ def main():
                 metavar='TARGET',
                 default='/dev/stdout',
                 help='target file, stdout if omitted')
+    parser.add_argument('-s', '--skip',
+                dest='skip',
+                type=int,
+                metavar='BYTES',
+                help='skip the given number of bytes before output')
+    parser.add_argument('-l', '--length',
+                dest='length',
+                type=int,
+                metavar='BYTES',
+                help='limit output to the given number of bytes')
     parser.add_argument('-t', '--text',
                 dest='text',
                 action='store_true',
@@ -82,8 +100,10 @@ def main():
     file = TzxFile()
     file.read(args.file or '/dev/stdin')
 
+    writer = lambda out, block : writeBlock(out, block, args.text, args.basic, args.skip, args.length)
+
     with open(args.to, 'wb') as out:
         if args.block != None:
-            writeSingleBlock(file, out, args.block, args.text, args.basic)
+            writeSingleBlock(file, out, args.block, writer)
         else:
-            writeAllBlocks(file, out, args.text, args.basic)
+            writeAllBlocks(file, out, writer)
