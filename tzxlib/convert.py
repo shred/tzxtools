@@ -93,3 +93,30 @@ def convertToBasic(data):
         result += decodeBasicLine(unpack('%dB' % (lineLen), data[pos + 4 : pos + 4 + lineLen]))
         pos += lineLen + 4
     return result
+
+def convertToDump(data, bytesPerRow=16):
+    result = ''
+    pos = 0
+    end = len(data)
+    while pos < end:
+        result += '%04X | ' % (pos)
+        text = ''
+        for x in range(0, bytesPerRow):
+            if pos + x < end:
+                result += '%02X ' % (data[pos + x])
+                ch = data[pos + x]
+                if ch < 32:
+                    text += '‧'
+                else:
+                    ch = convChar(ch)
+                    if len(ch) == 1:
+                        text += ch
+                    else:
+                        text += '‧'
+            else:
+                result += '   '
+        result += '| '
+        result += text
+        result += '\n'
+        pos += bytesPerRow
+    return result

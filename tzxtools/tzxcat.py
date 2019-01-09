@@ -25,6 +25,7 @@ import sys
 from tzxlib.tzxfile import TzxFile
 from tzxlib.convert import convertToText
 from tzxlib.convert import convertToBasic
+from tzxlib.convert import convertToDump
 
 def writeBlock(out, block, converter, skip, length):
     data = block.tap.body()
@@ -91,6 +92,10 @@ def main():
                 dest='basic',
                 action='store_true',
                 help='convert ZX Spectrum BASIC to UTF-8 text')
+    parser.add_argument('-d', '--dump',
+                dest='dump',
+                action='store_true',
+                help='convert to a hex dump')
     args = parser.parse_args()
 
     file = TzxFile()
@@ -101,6 +106,8 @@ def main():
         converter = lambda data : convertToBasic(data).encode('utf-8')
     elif args.text:
         converter = lambda data: convertToText(data).encode('utf-8')
+    elif args.dump:
+        converter = lambda data: convertToDump(data).encode('utf-8')
 
     writer = lambda out, block : writeBlock(out, block, converter, args.skip, args.length)
 
