@@ -81,8 +81,7 @@ def decodeBasicLine(line):
             result += convChar(ch, result[-1:] == ' ')
     return result
 
-def convertToBasic(data):
-    result = ''
+def convertToBasic(data, out, org=0):
     pos = 0
     end = len(data)
     while pos + 4 < end:
@@ -90,21 +89,19 @@ def convertToBasic(data):
         lineLen = unpack('<H', data[pos + 2 : pos + 4])[0]
         if pos + lineLen + 4 > end:
             break
-        result += '%4d' % (lineNum)
-        result += decodeBasicLine(unpack('%dB' % (lineLen), data[pos + 4 : pos + 4 + lineLen]))
+        line = '%4d%s' % (lineNum, decodeBasicLine(unpack('%dB' % (lineLen), data[pos + 4 : pos + 4 + lineLen])))
+        out.write(line.encode('utf-8'))
         pos += lineLen + 4
-    return result
 
-def convertToDump(data, bytesPerRow=16):
-    result = ''
+def convertToDump(data, out, org=0, bytesPerRow=16):
     pos = 0
     end = len(data)
     while pos < end:
-        result += '%04X | ' % (pos)
+        line = '%04X | ' % (pos + org)
         text = ''
         for x in range(bytesPerRow):
             if pos + x < end:
-                result += '%02X ' % (data[pos + x])
+                line += '%02X ' % (data[pos + x])
                 ch = data[pos + x]
                 if ch < 32:
                     text += '‧'
@@ -115,15 +112,14 @@ def convertToDump(data, bytesPerRow=16):
                     else:
                         text += '‧'
             else:
-                result += '   '
-        result += '| '
-        result += text
-        result += '\n'
+                line += '   '
+        line += '| '
+        line += text
+        line += '\n'
+        out.write(line.encode('utf-8'))
         pos += bytesPerRow
-    return result
 
-def convertToAssembler(data, org=0):
-    result = ''
+def convertToAssembler(data, out, org=0):
     pos = 0
     end = len(data)
     while pos < end:
@@ -131,21 +127,21 @@ def convertToAssembler(data, org=0):
             (ins, length) = disassemble(data, pos, org)
         except:
             (ins, length) = ('???', 1)
-        result += '%04X  ' % (pos + org)
+        line = '%04X  ' % (pos + org)
         for x in range(6):
             if x == 5 and length > 6:
-                result += '...'
+                line += '...'
             elif x < length:
-                result += '%02X ' % (data[pos + x])
+                line += '%02X ' % (data[pos + x])
             else:
-                result += '   '
-        result += ' '
-        result += ins
-        result += '\n'
+                line += '   '
+        line += ' '
+        line += ins
+        line += '\n'
+        out.write(line.encode('utf-8'))
         pos += length
-    return result
 
-def convertToScreen(data, out):
+def convertToScreen(data, out, org=0):
     pixel = []
     for y in range(192):
         pixrow = []

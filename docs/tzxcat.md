@@ -30,7 +30,7 @@ A converter can be applied to the output. If no converter is chosen, the output 
 
 Additional converter options:
 
-* `-O`, `--org`: Define the base address for disassembling. If not given, the starting address given in the previous `Bytes` header is used automatically.
+* `-O`, `--org`: Define the base address for hex dumps and disassembled code. If not given, the starting address given in the previous `Bytes` header is used automatically. If there is no such header, 0 is assumed as base address.
 
 ## Example
 

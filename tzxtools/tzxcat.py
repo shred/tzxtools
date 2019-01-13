@@ -126,17 +126,17 @@ def main():
 
     converter = None
     if args.basic:
-        converter = lambda data, out, org: out.write(convertToBasic(data).encode('utf-8'))
+        converter = convertToBasic
     elif args.assembler:
-        converter = lambda data, out, org: out.write(convertToAssembler(data, org or 0).encode('utf-8'))
+        converter = convertToAssembler
     elif args.screen:
-        converter = lambda data, out, org: convertToScreen(data, out)
+        converter = convertToScreen
     elif args.text:
         converter = lambda data, out, org: out.write(convertToText(data).encode('utf-8'))
     elif args.dump:
-        converter = lambda data, out, org: out.write(convertToDump(data).encode('utf-8'))
+        converter = convertToDump
 
-    writer = lambda out, block, org : writeBlock(out, block, converter, args.skip, args.length, args.org or org)
+    writer = lambda out, block, org : writeBlock(out, block, converter, args.skip, args.length, args.org or org or 0)
 
     with open(args.to, 'wb') as out:
         if args.block != None:
