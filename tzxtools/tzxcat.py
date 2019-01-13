@@ -33,9 +33,13 @@ from tzxlib.convert import convertToScreen
 def writeBlock(out, block, converter, skip, length, org):
     data = block.tap.body()
     if skip:
-        data = data[skip:]
+        if 0 <= skip < len(data):
+            data = data[skip:]
+        else:
+            data = []
     if length:
-        data = data[:length]
+        if 0 <= length < len(data):
+            data = data[:length]
     if converter:
         data = converter(data, out, org)
 
