@@ -2,6 +2,16 @@
 
 This is a collection of command line tools for processing [TZX](http://www.worldofspectrum.org/TZXformat.html) files. TZX is a common file format for preserving computer tapes of the ZX Spectrum, but also Amstrad CPC and C64. All the _tzxtools_ are witten in Python 3.
 
+## Features
+
+* Convert your old ZX Spectrum tape recordings into TZX files.
+* List, split, merge, and divide the blocks inside TZX files.
+* Extract binary content from TZX blocks.
+* Read hex dumps, disassembled Z80 machine code, or BASIC code.
+* Convert ZX Spectrum screens to PNG files.
+* Generate TAP files for ZX Spectrum Next and some emulators.
+* Disassembler also supports all undocumented Z80 instructions and ZX Spectrum Next instructions.
+
 ## Installation
 
 ```sh

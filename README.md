@@ -1,6 +1,16 @@
 # tzxtools
 
-This is a collection of command line tools for processing [TZX](http://www.worldofspectrum.org/TZXformat.html) files. TZX is a common file format for preserving computer tapes of the ZX Spectrum, but also Amstrad CPC and C64. All the _tzxtools_ are witten in Python 3.
+This is a collection of command line tools for processing [TZX](http://www.worldofspectrum.org/TZXformat.html) files. TZX is a common file format for preserving computer tapes of the ZX Spectrum, but also Amstrad CPC and C64. All the _tzxtools_ are written in Python 3.
+
+## Features
+
+* Convert your old ZX Spectrum tape recordings into TZX files.
+* List, split, merge, and divide the blocks inside TZX files.
+* Extract binary content from TZX blocks.
+* Read hex dumps, disassembled Z80 machine code, or BASIC code.
+* Convert ZX Spectrum screens to PNG files.
+* Generate TAP files for ZX Spectrum Next and some emulators.
+* Disassembler also supports all undocumented Z80 instructions and ZX Spectrum Next instructions.
 
 ## Installation
 
@@ -10,14 +20,14 @@ pip install tzxtools
 
 ## Tools
 
-* `tzxcat` - Extracts file data from a TZX file
-* `tzxcleanup` - Removes all clutter and leaves a clean tape file
-* `tzxcut` - Cuts blocks from a TZX file
-* `tzxls` - Shows the contents of a TZX file
-* `tzxmerge` - Concatenates multiple TZX files into one file
-* `tzxsplit` - Splits a TZX file into separate programs
-* `tzxtap` - Converts a TZX file to TAP file format
-* `tzxwav` - Converts WAV file tape recordings to TZX files
+* `tzxcat` - Extracts data from a TZX file. Optionally disassembles, hex dumps or converts blocks to PNG.
+* `tzxcleanup` - Removes all clutter blocks and leaves a clean TZX file.
+* `tzxcut` - Cuts blocks from a TZX file.
+* `tzxls` - Lists the contents of a TZX file.
+* `tzxmerge` - Concatenates multiple TZX files into one file.
+* `tzxsplit` - Splits a TZX file into separate programs.
+* `tzxtap` - Converts a TZX file to TAP file format.
+* `tzxwav` - Converts WAV file tape recordings to TZX files.
 
 See the [documentation](https://shredzone.org/docs/tzxtools/index.html) for how the tools are used.
 

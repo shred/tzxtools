@@ -29,12 +29,12 @@ Remember that blocks are counted starting from zero.
 
 Negative block numbers are counted backwards from the last block:
 
-* `-1` - Keep the last block.
+* `-1` - Keep only the last block.
 * `4:-2` - Keep block numbers from 4 up to the second to last block.
 * `-4:` - Keep the last four blocks.
 * `:-3` - Keep all the blocks up the third to last block.
 
-If you use negative block numbers, it is wise to place a `--` at the command line before the block ranges, so negative block numbers are not interpreted as options.
+If you use negative block numbers, it is wise to place a `--` at the command line before the block ranges, so negative block numbers are not interpreted as options (see example below).
 
 ## Example
 

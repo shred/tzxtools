@@ -15,7 +15,7 @@ tzxtap [-h] [-o TARGET] [-i] [file]
 
 * `file`: TZX file to read from, or `stdin` if not given.
 * `-o`, `--to`: Target TAP file to write. If omitted, `stdout` is used.
-* `-i`, `--ignore`: Ignore blocks that cannot be stored in a TAP file.
+* `-i`, `--ignore`: Ignore blocks that cannot be stored into a TAP file.
 * `-h`, `--help`: Show help message and exit.
 
 ## Example
