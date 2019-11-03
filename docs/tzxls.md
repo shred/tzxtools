@@ -4,6 +4,8 @@ Lists the contents of a TZX file.
 
 Ths tool shows the block numbers, block types and some block contents of a TZX file.
 
+For ZX Spectrum TZX files, it also shows header contents (like program names or data types). Note that CRC checks only apply for ZX Spectrum files. For other machines, this tool will always report false CRC errors.
+
 ## Usage
 
 ```

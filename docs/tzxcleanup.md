@@ -6,6 +6,8 @@ This is useful to clean up TZX files generated from a tape. Make sure that the d
 
 This tool is also useful if Fuse's `audio2tape` was invoked without `-r` option and thus created only Turbo Speed Data Blocks. They will be converted to Standard Speed Data Blocks unless they are too large.
 
+Use this tool for ZX Spectrum TZX files only! Other machines may be unable to read the resulting file.
+
 ## Usage
 
 ```

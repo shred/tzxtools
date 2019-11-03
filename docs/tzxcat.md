@@ -4,7 +4,7 @@ Extracts the binary content of TZX data blocks to a file.
 
 This tool is useful to migrate tape computer files to modern computers.
 
-It also brings a set of converters to BASIC, assembler, image (PNG), plain text and hex dump.
+It also brings a set of converters to ZX Spectrum BASIC, assembler, ZX Spectrum screens, plain text and hex dump.
 
 ## Usage
 
@@ -15,7 +15,7 @@ tzxcat [-h] [-b NR] [-o TARGET] [-s BYTES] [-l BYTES]
 
 * `file`: TZX file to read from, or `stdin` if not given.
 * `-o`, `--to`: Target file. If omitted, `stdout` is used.
-* `-b`, `--block`: Only extract the TZX block with the given block number. If omitted, all data blocks are concatenated to a single output stream. The selected block must be a data block. If the block has a bad CRC, a warning is printed, but the content is extracted nevertheless.
+* `-b`, `--block`: Only extract the TZX block with the given block number. If omitted, all data blocks are concatenated to a single output stream. The selected block must be a data block. If the block has a bad CRC, a warning is printed, but the content is extracted nevertheless. If this is not a ZX Spectrum block, a false CRC error is always reported and can be ignored.
 * `-s`, `--skip`: Skip the given number of bytes before output. If omitted, nothing is skipped. If it exceeds the block length, an empty block is written.
 * `-l`, `--length`: Limit the output to the given number of bytes. The rest of the block is written if this parameter is omitted or if it exceeds the block length.
 * `-h`, `--help`: Show help message and exit.

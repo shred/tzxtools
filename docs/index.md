@@ -1,18 +1,23 @@
 # tzxtools
 
-This is a collection of command line tools for processing [TZX](http://www.worldofspectrum.org/TZXformat.html) files. TZX is a common file format for preserving computer tapes of the ZX Spectrum, but also Amstrad CPC and C64. All the _tzxtools_ are witten in Python 3.
+This is a collection of command line tools for processing [TZX](http://www.worldofspectrum.org/TZXformat.html) files.
+
+TZX is a common file format for preserving computer tapes of the ZX Spectrum, but also Amstrad CPC and C64.
+`tzxtools` mainly supports ZX Spectrum TZX files, but raw file operations can be applied on any TZX file.
 
 ## Features
 
 * Convert your old ZX Spectrum tape recordings into TZX files.
 * List, split, merge, and divide the blocks inside TZX files.
 * Extract binary content from TZX blocks.
-* Read hex dumps, disassembled Z80 machine code, or BASIC code.
+* Read hex dumps, disassembled Z80 machine code, or ZX Spectrum BASIC code.
 * Convert ZX Spectrum screens to PNG files.
 * Generate TAP files for ZX Spectrum Next and some emulators.
 * Disassembler also supports all undocumented Z80 instructions and ZX Spectrum Next instructions.
 
 ## Installation
+
+All the _tzxtools_ are written in Python 3.
 
 ```sh
 pip install tzxtools
@@ -20,14 +25,14 @@ pip install tzxtools
 
 ## The Tools
 
-* [`tzxcat`](tzxcat.md) - Extracts file data from a TZX file
-* [`tzxcleanup`](tzxcleanup.md) - Removes all clutter and leaves a clean tape file
-* [`tzxcut`](tzxcut.md) - Cuts blocks from a TZX file
-* [`tzxls`](tzxls.md) - Shows the contents of a TZX file
-* [`tzxmerge`](tzxmerge.md) - Concatenates multiple TZX files into one file
-* [`tzxsplit`](tzxsplit.md) - Splits a TZX file into separate programs
-* [`tzxtap`](tzxtap.md) - Converts a TZX file to a TAP file
-* [`tzxwav`](tzxwav.md) - Converts WAV file tape recordings to TZX files
+* [`tzxcat`](tzxcat.md) - Extracts data from a TZX file. Optionally disassembles, hex dumps or converts blocks to PNG.
+* [`tzxcleanup`](tzxcleanup.md) - Removes all clutter and leaves a clean tape file.
+* [`tzxcut`](tzxcut.md) - Cuts blocks from a TZX file.
+* [`tzxls`](tzxls.md) - Lists the contents of a TZX file.
+* [`tzxmerge`](tzxmerge.md) - Concatenates multiple TZX files into one file.
+* [`tzxsplit`](tzxsplit.md) - Splits a TZX file into separate programs.
+* [`tzxtap`](tzxtap.md) - Converts a TZX file to TAP file format.
+* [`tzxwav`](tzxwav.md) - Converts WAV file ZX Spectrum tape recordings to TZX files.
 
 ## Open Source
 
