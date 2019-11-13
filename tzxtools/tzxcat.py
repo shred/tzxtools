@@ -128,7 +128,7 @@ def main():
     file = TzxFile()
     file.read(args.file or '/dev/stdin')
 
-    converter = None
+    converter = lambda data, out, org: out.write(data)  # default binary output
     if args.basic:
         converter = convertToBasic
     elif args.assembler:
