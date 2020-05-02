@@ -323,6 +323,9 @@ class TzxbTextDescription(TzxbBlock):
         len = unpack('<B', self.data)[0]
         self.data += tzx.read(len)
 
+    def __str__(self):
+        return self.data[1:].decode('ISO-8859-15')
+
 
 class TzxbMessage(TzxbBlock):
     id = 0x31
