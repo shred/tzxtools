@@ -591,7 +591,7 @@ INSTRUCTIONS_ED_A = [
     'otir',         # B3
     'ldirx',        # B4 - ZX Spectrum Next op code
     None,           # B5
-    None,           # B6
+    "ldirscale",    # B6 - ZX Spectrum Next op code (considered)
     'ldpirx',       # B7 - ZX Spectrum Next op code
     'lddr',         # B8
     'cpdr',         # B9
