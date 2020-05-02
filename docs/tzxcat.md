@@ -24,7 +24,7 @@ A converter can be applied to the output. If no converter is chosen, the output 
 
 * `-t`, `--text`: Convert ZX Spectrum text to UTF-8.
 * `-B`, `--basic`: Convert ZX Spectrum BASIC to plain UTF-8 text. The result is what you would see on the screen after a `LIST` command. Inline attribute changes are ignored though.
-* `-A`, `--assembler`: Disassemble the block, using a simple Z80 disassembler. Undocumented Z80 op codes and ZX Spectrum Next op codes are supported. Note that ZX Spectrum Next op codes are still subject to change.
+* `-A`, `--assembler`: Disassemble the block, using a simple Z80 disassembler. Undocumented Z80 op codes and Z80N (ZX Spectrum Next) op codes are supported. The disassembler also supports the `exit` and `break` pseudo op codes of the #CSpect emulator.
 * `-S`, `--screen`: Convert a ZX Spectrum SCREEN$ to PNG. It is recommended to select the SCREEN block using the `--block` option.
 * `-d`, `--dump`: Generate a hex dump of the block contents.
 

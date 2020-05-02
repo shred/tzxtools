@@ -12,7 +12,7 @@ TZX is a common file format for preserving computer tapes of the ZX Spectrum, bu
 * Read hex dumps, disassembled Z80 machine code, or ZX Spectrum BASIC code.
 * Convert ZX Spectrum screens to PNG files.
 * Generate TAP files for ZX Spectrum Next and some emulators.
-* Disassembler also supports all undocumented Z80 instructions and ZX Spectrum Next instructions.
+* Disassembler also supports all undocumented Z80 instructions and Z80N (ZX Spectrum Next) instructions.
 
 ## Installation
 

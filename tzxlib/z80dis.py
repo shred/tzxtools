@@ -31,6 +31,15 @@ def disassemble(data, pc, org=0):
         op = data[pc + step]
         step += 1
         if op == 0xDD:
+            op2 = data[pc + step]
+            if op2 == 0x00:
+                step += 1
+                ins = "exit"        # cspect emulator pseudo command
+                break
+            if op2 == 0x01:
+                step += 1
+                ins = "break"       # cspect emulator pseudo command
+                break
             ix = True
             iy = False
         elif op == 0xFD:
