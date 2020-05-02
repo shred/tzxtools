@@ -43,26 +43,27 @@ def writeBlock(out, block, converter, skip, length, org):
     if converter:
         data = converter(data, out, org)
 
-def writeSingleBlock(tzx, out, index, writer):
+def writeSingleBlock(tzx, out, index, writer, skipNonTap=False):
     if index < 0 or index >= len(tzx.blocks):
         print('Error: Block %d out of range' % (index), file=sys.stderr)
         exit(1)
     b = tzx.blocks[index]
+    if b.id == 0x30:
+        out.write((str(b) + '\n').encode('utf-8'))
+        return
     if not hasattr(b, 'tap'):
-        print('Error: Block %d has no data content' % (index), file=sys.stderr)
-        exit(1)
+        if skipNonTap:
+            return
+        else:
+            print('Error: Block %d has no data content' % (index), file=sys.stderr)
+            exit(1)
     if not b.tap.valid():
         print('Warning: Block %d has bad CRC' % (index), file=sys.stderr)
     writer(out, b, findOrg(tzx, index))
 
 def writeAllBlocks(tzx, out, writer):
-    cnt = 0
-    for b in tzx.blocks:
-        if hasattr(b, 'tap'):
-            if not b.tap.valid():
-                print('Warning: Block %d has bad CRC' % (cnt), file=sys.stderr)
-            writer(out, b, findOrg(tzx, cnt))
-        cnt += 1
+    for i in range(len(tzx.blocks)):
+        writeSingleBlock(tzx, out, i, writer, True)
 
 def findOrg(tzx, index):
     if index > 1:
