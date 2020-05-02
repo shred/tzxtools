@@ -4,12 +4,12 @@ site_url: https://shredzone.org/docs/tzxtools/index.html
 theme:
     name: material
     font: false
-    logo:
-        icon: 'save'
+    icon:
+        logo: 'fontawesome/solid/save'
     palette:
         primary: 'blue'
         accent: 'deep orange'
-pages:
+nav:
   - 'Installation': 'index.md'
   - 'tzxcat': 'tzxcat.md'
   - 'tzxcleanup': 'tzxcleanup.md'
