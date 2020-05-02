@@ -17,7 +17,7 @@ tzxwav [-h] [-o TARGET] [-p] [-v] [-t {low,med,high}]
 * `file`: WAV file to read from. Supported is mono and stereo, 8 and 16 bit per channel, any sampling rate. Other file formats are not supported.
 * `-o`, `--to`: Target file. If omitted, `stdout` is used.
 * `-p`, `--progress`: Show a progress bar on `stderr`.
-* `-v`, `--verbose`: Be verbose, show blocks as they are found.
+* `-v`, `--verbose`: Be verbose, show blocks as they are found. It also shows the starting and ending frame number of each block. This can be used for manually repairing CRC errors at the ending frame, or for selecting individual blocks with the `--start` and `--end` option.
 * `-t`, `--treshold`: Change sound/noise ratio treshold. Default is `mid`. Try `low` if data blocks are missing or shorter than expected. Try `high` if data blocks are longer than expected.
 * `-T`, `--tolerance`: Change tape speed flutter tolerance. Default is `mid`. Try `low` if the TZX file contains many useless blocks. Try `high` if you miss headers or data blocks in the TZX file, or if data blocks are shorter than expected.
 * `-l`, `--leader`: Acceptable minimal leader signal length. Default is `normal`. If there are a lot of headerless blocks, or if there are blocks missing in the TZX file, it is worth a try to play with this parameter. `none` even accepts a single header pulse.

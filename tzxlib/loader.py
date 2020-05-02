@@ -63,10 +63,15 @@ class TapeLoader():
             while True:
                 try:
                     tzxbd = TzxbData()
-                    tzxbd.setup(self._loadBlock())
+                    (tzxData, startPos, endPos) = self._loadBlock()
+                    tzxbd.setup(tzxData)
                     tzx.blocks.append(tzxbd)
                     if self.verbose:
-                        print(str(tzxbd), file=sys.stderr)
+                        print(('Frame {:9d} - {:9d}: {}').format(
+                             startPos,
+                             endPos,
+                             str(tzxbd)
+                        ), file=sys.stderr)
                 except BadBlock:
                     continue    # Try again with the next block
                 except EOFError:
@@ -160,7 +165,7 @@ class TapeLoader():
             tap = tapCreator.createTap()
             if self.debug >= 1:
                 self._showBlock(tap, leaderPos, syncPos, self.samples.position())
-            return tap
+            return (tap, leaderPos, self.samples.position())
 
     def _testLeaderPulse(self):
         self.samples.ensure()
