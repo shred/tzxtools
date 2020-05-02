@@ -60,7 +60,7 @@ setup(
     packages=['tzxtools', 'tzxlib'],
 
     install_requires=[
-        'pypng >= 0.0.18',
+        'pypng >= 0.0.20',
     ],
 
     entry_points={
