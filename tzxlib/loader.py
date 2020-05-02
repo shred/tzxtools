@@ -364,7 +364,7 @@ class TapeReader():
             self.frameCount = self.startFrame
             self.startFrame = None
             while skip > 0:
-                sf = skip % 1000
+                sf = skip if skip < 1000 else 1000
                 skip -= sf
                 frames = self.wav.readframes(sf)
                 if not frames:
