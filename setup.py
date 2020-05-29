@@ -26,7 +26,7 @@ def readme():
 
 setup(
     name='tzxtools',
-    version='1.4.0',
+    version='1.5.0',
     description='A tool collection for processing tzx files',
     long_description=readme(),
     long_description_content_type='text/markdown',
