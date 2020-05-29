@@ -2,8 +2,7 @@
 
 This is a collection of command line tools for processing [TZX](http://www.worldofspectrum.org/TZXformat.html) files.
 
-TZX is a common file format for preserving computer tapes of the ZX Spectrum, but also Amstrad CPC and C64.
-`tzxtools` mainly supports ZX Spectrum TZX files, but raw file operations can be applied on any TZX file.
+TZX is a common file format for preserving computer tapes of the ZX Spectrum, but also Amstrad CPC and C64. `tzxtools` mainly supports ZX Spectrum TZX files, but raw file operations can be applied on any TZX file. It also supports TSX files, which are mainly used for MSX.
 
 ## Features
 
@@ -14,6 +13,7 @@ TZX is a common file format for preserving computer tapes of the ZX Spectrum, bu
 * Convert ZX Spectrum screens to PNG files.
 * Generate TAP files for ZX Spectrum Next and some emulators.
 * Disassembler also supports all undocumented Z80 instructions and Z80N (ZX Spectrum Next) instructions.
+* Also supports TSX Kansas City Standard blocks.
 
 ## Installation
 
