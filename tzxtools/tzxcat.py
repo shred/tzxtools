@@ -30,36 +30,34 @@ from tzxlib.convert import convertToDump
 from tzxlib.convert import convertToAssembler
 from tzxlib.convert import convertToScreen
 
-def writeBlock(out, block, converter, skip, length, org):
-    data = block.tap.body()
+def writeBlock(out, dump, converter, skip, length, org):
     if skip:
-        if 0 <= skip < len(data):
-            data = data[skip:]
+        if 0 <= skip < len(dump):
+            dump = dump[skip:]
         else:
-            data = []
+            dump = []
     if length:
-        if 0 <= length < len(data):
-            data = data[:length]
+        if 0 <= length < len(dump):
+            dump = dump[:length]
     if converter:
-        data = converter(data, out, org)
+        dump = converter(dump, out, org)
+    return dump
 
-def writeSingleBlock(tzx, out, index, writer, skipNonTap=False):
+def writeSingleBlock(tzx, out, index, writer, skipNotDumpable=False):
     if index < 0 or index >= len(tzx.blocks):
         print('Error: Block %d out of range' % (index), file=sys.stderr)
         exit(1)
     b = tzx.blocks[index]
-    if b.id == 0x30:
-        out.write((str(b) + '\n').encode('utf-8'))
-        return
-    if not hasattr(b, 'tap'):
-        if skipNonTap:
+    d = b.dump()
+    if d is None:
+        if skipNotDumpable:
             return
         else:
             print('Error: Block %d has no data content' % (index), file=sys.stderr)
             exit(1)
-    if not b.tap.valid():
+    if hasattr(b, 'tap') and not b.tap.valid():
         print('Warning: Block %d has bad CRC' % (index), file=sys.stderr)
-    writer(out, b, findOrg(tzx, index))
+    writer(out, d, findOrg(tzx, index))
 
 def writeAllBlocks(tzx, out, writer):
     for i in range(len(tzx.blocks)):
@@ -141,7 +139,7 @@ def main():
     elif args.dump:
         converter = convertToDump
 
-    writer = lambda out, block, org : writeBlock(out, block, converter, args.skip, args.length, args.org or org or 0)
+    writer = lambda out, dump, org : writeBlock(out, dump, converter, args.skip, args.length, args.org or org or 0)
 
     with open(args.to, 'wb') as out:
         if args.block != None:

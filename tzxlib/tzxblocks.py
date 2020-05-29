@@ -74,6 +74,9 @@ class TzxbBlock():
         tzx.write(bytes([self.id]))
         tzx.write(self.data)
 
+    def dump(self):
+        return None
+
     def __str__(self):
         return ''
 
@@ -97,6 +100,9 @@ class TzxbData(TzxbBlock):
 
     def valid(self):
         return self.tap.valid()
+
+    def dump(self):
+        return self.tap.body()
 
     def __str__(self):
         return str(self.tap)
@@ -126,6 +132,9 @@ class TzxbTurboData(TzxbBlock):
         result.data = self.data[0x0D:0x11]
         result.tap = self.tap
         return result
+
+    def dump(self):
+        return self.tap.body()
 
     def __str__(self):
         return str(self.tap)
@@ -175,6 +184,9 @@ class TzxbPureData(TzxbBlock):
         result.data = self.data[0x05:0x09]
         result.tap = self.tap
         return result
+
+    def dump(self):
+        return self.tap.body()
 
     def __str__(self):
         return str(self.tap)
@@ -327,6 +339,9 @@ class TzxbTextDescription(TzxbBlock):
     def __str__(self):
         return self.data[1:].decode('ISO-8859-15')
 
+    def dump(self):
+        return self.data[1:]
+
 
 class TzxbMessage(TzxbBlock):
     id = 0x31
@@ -336,6 +351,9 @@ class TzxbMessage(TzxbBlock):
         self.data = tzx.read(0x02)
         len = unpack('<xB', self.data)[0]
         self.data += tzx.read(len)
+
+    def dump(self):
+        return self.data[2:]
 
 
 class TzxbArchiveInfo(TzxbBlock):
@@ -375,6 +393,9 @@ class TzxbCustomInfo(TzxbBlock):
         len = unpack('<L', self.data[0x10:0x14])[0]
         self.data += tzx.read(len)
 
+    def dump(self):
+        return self.data[0x14:]
+
 
 class TzxbSnapshot(TzxbBlock): # deprecated
     id = 0x40
@@ -390,6 +411,9 @@ class TzxbSnapshot(TzxbBlock): # deprecated
 class TzxbKansasCityStandard(TzxbBlock):
     id = 0x4B
     type = 'Kansas City Standard'
+
+    def dump(self):
+        return self.data[0x10:]
 
 
 class TzxbGlue(TzxbBlock):

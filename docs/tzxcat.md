@@ -75,3 +75,15 @@ tzxcat --block 6 --assembler --org 32768 sources.tzx
 ```
 
 The same as above, but 32768 is used as fixed base address.
+
+## Supported Block Types
+
+`tzxcat` can extract binary data from all block types containing actual data:
+
+- 10 - Standard Speed Data Block
+- 11 - Turbo Speed Data Block
+- 14 - Pure Data Block
+- 30 - Text description
+- 31 - Message
+- 35 - Custom info
+- 4B - Kansas City Standard
