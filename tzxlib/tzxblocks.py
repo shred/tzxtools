@@ -77,6 +77,9 @@ class TzxbBlock():
     def dump(self):
         return None
 
+    def info(self):
+        return None
+
     def __str__(self):
         return ''
 
@@ -147,7 +150,7 @@ class TzxbPureTone(TzxbBlock):
     def read(self, tzx):
         self.data = tzx.read(0x04)
 
-    def __str__(self):
+    def info(self):
         return '%d x %d T-states' % unpack('<HH', self.data)
 
 
@@ -159,6 +162,10 @@ class TzxbPulseSequence(TzxbBlock):
         self.data = tzx.read(0x01)
         len = unpack('<B', self.data)[0]
         self.data += tzx.read(len * 2)
+
+    def info(self):
+        return '{} pulses'.format((len(self.data)-1) // 2)
+
 
 class TzxbPureData(TzxbBlock):
     id = 0x14
@@ -243,7 +250,7 @@ class TzxbPause(TzxbBlock):
     def length(self):
         return unpack('<H', self.data)[0]
 
-    def __str__(self):
+    def info(self):
         return '%d ms' % (self.length())
 
 
@@ -255,6 +262,9 @@ class TzxbGroupStart(TzxbBlock):
         self.data = tzx.read(0x01)
         len = unpack('<B', self.data)[0]
         self.data += tzx.read(len)
+
+    def __str__(self):
+        return self.data[1:].decode('ISO-8859-15').strip()
 
 
 class TzxbGroupEnd(TzxbBlock):
@@ -272,6 +282,9 @@ class TzxbJumpTo(TzxbBlock):
     def read(self, tzx):
         self.data = tzx.read(0x02)
 
+    def __str__(self):
+        return str(unpack('<h', self.data)[0])
+
 
 class TzxbLoopStart(TzxbBlock):
     id = 0x24
@@ -279,6 +292,9 @@ class TzxbLoopStart(TzxbBlock):
 
     def read(self, tzx):
         self.data = tzx.read(0x02)
+
+    def __str__(self):
+        return str(unpack('<h', self.data)[0])
 
 
 class TzxbLoopEnd(TzxbBlock):
@@ -326,6 +342,9 @@ class TzxbSetSignalLevel(TzxbBlock):
     id = 0x2B
     type = 'Set signal level'
 
+    def __str__(self):
+        return "high" if self.data[0x04] == 1 else "low"
+
 
 class TzxbTextDescription(TzxbBlock):
     id = 0x30
@@ -336,11 +355,11 @@ class TzxbTextDescription(TzxbBlock):
         len = unpack('<B', self.data)[0]
         self.data += tzx.read(len)
 
-    def __str__(self):
-        return self.data[1:].decode('ISO-8859-15')
-
     def dump(self):
         return self.data[1:]
+
+    def info(self):
+        return self.data[1:].decode('ISO-8859-15')
 
 
 class TzxbMessage(TzxbBlock):
@@ -355,15 +374,34 @@ class TzxbMessage(TzxbBlock):
     def dump(self):
         return self.data[2:]
 
+    def info(self):
+        return self.data[2:].decode('ISO-8859-15')
+
 
 class TzxbArchiveInfo(TzxbBlock):
     id = 0x32
     type = 'Archive info'
+    identifications = [
+        'Title', 'Publisher', 'Author', 'Publication',
+        'Language', 'Type', 'Price', 'Loader', 'Origin'
+    ]
 
     def read(self, tzx):
         self.data = tzx.read(0x02)
         len = unpack('<H', self.data)[0]
         self.data += tzx.read(len)
+
+    def info(self):
+        result = ''
+        ix = 0x03
+        for _ in range(self.data[2]):
+            (tp, tl) = unpack('BB', self.data[ix:ix+2])
+            result += self.identifications[tp] if 0 <= tp < len(self.identifications) else 'Comment'
+            result += ': '
+            result += self.data[ix+2:ix+2+tl].decode('ISO-8859-15').replace('\r', '\n').replace('\n', '\n\t').strip()
+            result += '\n'
+            ix += 2 + tl
+        return result
 
 
 class TzxbHardwareType(TzxbBlock):
@@ -396,6 +434,16 @@ class TzxbCustomInfo(TzxbBlock):
     def dump(self):
         return self.data[0x14:]
 
+    def identification(self):
+        return self.data[0:0x10].decode('ISO-8859-15')
+
+    def info(self):
+        txt = self.data[0x14:].decode('ISO-8859-15')
+        return txt if '\0' not in txt else None
+
+    def __str__(self):
+        return self.identification().strip()
+
 
 class TzxbSnapshot(TzxbBlock): # deprecated
     id = 0x40
@@ -414,6 +462,9 @@ class TzxbKansasCityStandard(TzxbBlock):
 
     def dump(self):
         return self.data[0x10:]
+
+    def info(self):
+        return "Data stream: {} bytes".format(len(self.data)-0x10)
 
 
 class TzxbGlue(TzxbBlock):

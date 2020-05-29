@@ -9,12 +9,13 @@ For ZX Spectrum TZX files, it also shows header contents (like program names or 
 ## Usage
 
 ```
-tzxls [-h] [-s] file [file ...]
+tzxls [-h] [-s] [-v] file [file ...]
 ```
 
 * `file`: TZX file or files to read from, or `stdin` if not given.
 * `-s`, `--short`: Only shows the names found in ZX Spectrum file headers.
 * `-h`, `--help`: Show help message and exit.
+* `-v`, `--verbose`: Show more details about each block, if available.
 
 ## Example
 
@@ -28,3 +29,9 @@ Lists all the TZX file blocks of `tape.tzx`.
 tzxls -s tape.tzx
 ```
 Lists the names of all the ZX Spectrum program and data files found on the `tape.tzx`.
+
+```
+tzxls -v tape.tzx
+```
+
+Lists all the TZX file blocks of `tape.tzx`, and shows details about each block.

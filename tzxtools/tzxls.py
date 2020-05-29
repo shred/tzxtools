@@ -20,6 +20,7 @@
 #
 
 import argparse
+import textwrap
 
 from tzxlib.tapfile import TapHeader
 from tzxlib.tzxfile import TzxFile
@@ -33,6 +34,10 @@ def main():
                 dest='short',
                 action='store_true',
                 help='list only the ZX Spectrum header names')
+    parser.add_argument('-v', '--verbose',
+                dest='verbose',
+                action='store_true',
+                help='show content of information blocks')
     args = parser.parse_args()
 
     for f in args.file if len(args.file) > 0 else ['/dev/stdin']:
@@ -49,4 +54,8 @@ def main():
                     print('%s: %s' % (b.tap.type(), b.tap.name()))
             else:
                 print('%3d  %-27s %s' % (cnt, b.type, str(b)))
+            if args.verbose:
+                info = b.info()
+                if info is not None:
+                    print(textwrap.indent(info.strip(), '\t'))
             cnt += 1
