@@ -52,6 +52,7 @@ class TzxbBlock():
         0x34: lambda: TzxbEmulationInfo(),
         0x35: lambda: TzxbCustomInfo(),
         0x40: lambda: TzxbSnapshot(),
+        0x4B: lambda: TzxbKansasCityStandard(),
         0x5A: lambda: TzxbGlue(),
     }
 
@@ -384,6 +385,11 @@ class TzxbSnapshot(TzxbBlock): # deprecated
         len = unpack('<BBB', self.data[0x01:0x04])
         len = len[2] << 16 | len[1] << 8 | len[0]
         self.data += tzx.read(len)
+
+
+class TzxbKansasCityStandard(TzxbBlock):
+    id = 0x4B
+    type = 'Kansas City Standard'
 
 
 class TzxbGlue(TzxbBlock):
