@@ -219,6 +219,9 @@ class TzxbC64Data(TzxbBlock): # deprecated
         len = unpack('<L', self.data)[0]
         self.data += tzx.read(len - 4)
 
+    def dump(self):
+        return self.data[0x28:]
+
 
 class TzxbC64TurboData(TzxbBlock): # deprecated
     id = 0x17
@@ -228,6 +231,9 @@ class TzxbC64TurboData(TzxbBlock): # deprecated
         self.data = tzx.read(0x04)
         len = unpack('<L', self.data)[0]
         self.data += tzx.read(len - 4)
+
+    def dump(self):
+        return self.data[0x16:]
 
 
 class TzxbCswRecording(TzxbBlock):
