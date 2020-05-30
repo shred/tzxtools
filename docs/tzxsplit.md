@@ -2,9 +2,9 @@
 
 Splits a TZX file into its different programs.
 
-This tool is useful to automatically split up a single TZX file of a mixed tape with different programs. `tzxsplit` searches for a ZX Spectrum "Program" block, and then extracts the program itself and all subsequent "bytes", "character array", "number array" and headerless blocks into a new TZX file, up to the next "Program" block.
+This tool is useful to automatically split up a single TZX file of a mixed tape with different programs. `tzxsplit` searches for a ZX Spectrum "Program" block, and then extracts the program itself and all subsequent blocks up to the next "Program" block.
 
-Each program and the subsequent data blocks are written into a separate TZX file, which is named like the program itself. A number is added to the file name, in order to avoid file name collisions.
+Each program and the subsequent blocks are written into a separate TZX file, which is named like the program itself. A number is added to the file name, in order to avoid file name collisions.
 
 If the tape file should not start with a "Program", all blocks up to the first Program are stored into a TZX file called "preamble.tzx".
 

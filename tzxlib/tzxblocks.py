@@ -129,12 +129,21 @@ class TzxbTurboData(TzxbBlock):
         return self.tap.valid()
 
     def asData(self):
-        if self.data[0x11] != 0:
-            return self     # Too large, won't fit into standard data block
-        result = TzxbData()
-        result.data = self.data[0x0D:0x11]
-        result.tap = self.tap
-        return result
+        (pilot, sync1, sync2, zerobit, onebit, tone, bits) = unpack('<HHHHHHB', self.data[0x00:0x0D])
+        if (self.data[0x11] == 0
+                and 2148 <= pilot   <= 2188
+                and  657 <= sync1   <=  677
+                and  725 <= sync2   <=  745
+                and  845 <= zerobit <=  865
+                and 1700 <= onebit  <= 1720
+                and tone > 2000
+                and bits == 8):
+            # Standard size and standard timing, convert to Standard Speed Data Block
+            result = TzxbData()
+            result.data = self.data[0x0D:0x11]
+            result.tap = self.tap
+            return result
+        return self
 
     def dump(self):
         return self.tap.body()
@@ -183,14 +192,6 @@ class TzxbPureData(TzxbBlock):
 
     def valid(self):
         return self.tap.valid()
-
-    def asData(self):
-        if self.data[0x09] != 0:
-            return self     # Too large, won't fit into standard data block
-        result = TzxbData()
-        result.data = self.data[0x05:0x09]
-        result.tap = self.tap
-        return result
 
     def dump(self):
         return self.tap.body()

@@ -51,8 +51,8 @@ def main():
     file.read(args.file)
     for b in file.blocks:
         # Convert Turbo blocks to standard timed blocks if possible
-        if b.id in [0x11, 0x14]:
-            o = b.asData()
+        if b.id == 0x11:
+            b = b.asData()
 
         # Use all data blocks for the output
         if b.id in [0x10, 0x11, 0x14]:
