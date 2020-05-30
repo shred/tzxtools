@@ -1,6 +1,6 @@
 # tzxtools
 
-This is a collection of command line tools for processing [TZX](http://www.worldofspectrum.org/TZXformat.html) files.
+This is a collection of command line tools for processing TZX files.
 
 TZX is a common file format for preserving computer tapes of the ZX Spectrum, but also Amstrad CPC, C64 and MSX. `tzxtools` mainly supports ZX Spectrum TZX files, but raw file operations can be applied on any TZX file. It also supports TSX files, which are mainly used for MSX.
 
@@ -35,6 +35,12 @@ pip install tzxtools
 * `tzxwav` - Converts WAV file ZX Spectrum tape recordings to TZX files.
 
 See the [documentation](https://shredzone.org/docs/tzxtools/index.html) for how the tools are used.
+
+## TZX and TSX File Format References
+
+The TZX File Format is specified at [World of Spectrum](https://www.worldofspectrum.org/TZXformat.html).
+
+The TSX "ID 4B - Kansas City Standard" block is not a part of the specification. A documentation can be found at the [makeTSX wiki](https://github.com/nataliapc/makeTSX/wiki/Tutorial-How-to-generate-TSX-files#14-the-new-4b-block).
 
 ## Contribute
 
