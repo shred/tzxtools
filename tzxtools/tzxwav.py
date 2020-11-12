@@ -136,4 +136,4 @@ def main():
         exit(1)
 
     if args.progress:
-        print()
+        print('', file=sys.stderr)
