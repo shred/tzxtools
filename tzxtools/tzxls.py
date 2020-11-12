@@ -20,6 +20,8 @@
 #
 
 import argparse
+import io
+import sys
 import textwrap
 
 from tzxlib.tapfile import TapHeader
@@ -28,7 +30,8 @@ from tzxlib.tzxfile import TzxFile
 def main():
     parser = argparse.ArgumentParser(description='List the contents of a TZX file')
     parser.add_argument('file',
-                nargs='*',
+                nargs=argparse.REMAINDER,
+                type=argparse.FileType('rb'),
                 help='TZX files, stdin if omitted')
     parser.add_argument('-s', '--short',
                 dest='short',
@@ -40,10 +43,18 @@ def main():
                 help='show content of information blocks')
     args = parser.parse_args()
 
-    for f in args.file if len(args.file) > 0 else ['/dev/stdin']:
-        if len(args.file) > 1:
-            print('\n%s:' % (f))
+    files = list(args.file)
+    if not sys.stdin.isatty() and len(files) == 0:
+        files.append(sys.stdin.buffer)
 
+    if len(files) == 0:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
+    for f in files:
+        if len(files) > 1:
+            name = f.name if hasattr(f, 'name') else f
+            print('\n%s:' % (name))
         tzx = TzxFile()
         tzx.read(f)
 

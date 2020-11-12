@@ -28,20 +28,24 @@ def main():
     parser = argparse.ArgumentParser(description='Remove all noise, idealize the data')
     parser.add_argument('file',
                 nargs='?',
-                default='/dev/stdin',
+                type=argparse.FileType('rb'),
+                default=(None if sys.stdin.isatty() else sys.stdin.buffer),
                 help='TZX file, stdin if omitted')
-    parser.add_argument('-o',
-                '--to',
+    parser.add_argument('-o', '--to',
                 dest='to',
                 metavar='TARGET',
-                default='/dev/stdout',
+                type=argparse.FileType('wb'),
+                default=sys.stdout.buffer,
                 help='target TZX file, stdout if omitted')
-    parser.add_argument('-c',
-                '--stripcrc',
+    parser.add_argument('-c', '--stripcrc',
                 dest='stripcrc',
                 action='store_true',
                 help='also remove blocks with bad CRC')
     args = parser.parse_args()
+
+    if args.file is None:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     fout = TzxFile()
     crcCnt = 0

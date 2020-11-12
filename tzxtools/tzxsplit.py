@@ -47,7 +47,8 @@ def main():
     parser = argparse.ArgumentParser(description='Split into separate programs')
     parser.add_argument('file',
                 nargs='?',
-                default='/dev/stdin',
+                type=argparse.FileType('rb'),
+                default=(None if sys.stdin.isatty() else sys.stdin.buffer),
                 help='TZX file, stdin if omitted')
     parser.add_argument('-d', '--dir',
                 dest='dir',
@@ -63,6 +64,10 @@ def main():
                 action='store_true',
                 help='skip all blocks before first Program')
     args = parser.parse_args()
+
+    if args.file is None:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     file = TzxFile()
     file.read(args.file)

@@ -20,6 +20,7 @@
 #
 
 import argparse
+import io
 import sys
 
 from tzxlib.tzxfile import TzxFile
@@ -75,7 +76,8 @@ def main():
     parser = argparse.ArgumentParser(description='Write data block content')
     parser.add_argument('file',
                 nargs='?',
-                default='/dev/stdin',
+                type=argparse.FileType('rb'),
+                default=(None if sys.stdin.isatty() else sys.stdin.buffer),
                 help='TZX file, stdin if omitted')
     parser.add_argument('-b', '--block',
                 dest='block',
@@ -85,7 +87,8 @@ def main():
     parser.add_argument('-o', '--to',
                 dest='to',
                 metavar='TARGET',
-                default='/dev/stdout',
+                type=argparse.FileType('wb'),
+                default=sys.stdout.buffer,
                 help='target file, stdout if omitted')
     parser.add_argument('-s', '--skip',
                 dest='skip',
@@ -124,8 +127,12 @@ def main():
                 help='base address for disassembled code')
     args = parser.parse_args()
 
+    if args.file is None:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
     file = TzxFile()
-    file.read(args.file or '/dev/stdin')
+    file.read(args.file)
 
     converter = lambda data, out, org: out.write(data)  # default binary output
     if args.basic:
@@ -141,7 +148,8 @@ def main():
 
     writer = lambda out, dump, org : writeBlock(out, dump, converter, args.skip, args.length, args.org or org or 0)
 
-    with open(args.to, 'wb') as out:
+    outf = args.to if args.to != '-' else sys.stdout.buffer
+    with outf if isinstance(outf, io.IOBase) else open(outf, 'wb') as out:
         if args.block != None:
             writeSingleBlock(file, out, args.block, writer)
         else:

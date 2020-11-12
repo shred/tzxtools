@@ -20,6 +20,7 @@
 #
 
 import argparse
+import io
 import sys
 
 from tzxlib.tzxfile import TzxFile
@@ -46,12 +47,14 @@ def main():
     parser = argparse.ArgumentParser(description='Convert to TAP file format')
     parser.add_argument('file',
                 nargs='?',
-                default='/dev/stdin',
+                type=argparse.FileType('rb'),
+                default=(None if sys.stdin.isatty() else sys.stdin.buffer),
                 help='TZX file, stdin if omitted')
     parser.add_argument('-o', '--to',
                 dest='to',
                 metavar='TARGET',
-                default='/dev/stdout',
+                type=argparse.FileType('wb'),
+                default=sys.stdout.buffer,
                 help='TAP file, stdout if omitted')
     parser.add_argument('-i', '--ignore',
                 dest='ignore',
@@ -59,8 +62,13 @@ def main():
                 help='ignore blocks that cannot be stored in a TAP file')
     args = parser.parse_args()
 
-    file = TzxFile()
-    file.read(args.file or '/dev/stdin')
+    if args.file is None:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
-    with open(args.to, 'wb') as out:
-        writeAllBlocks(file, out, args.ignore)
+    file = TzxFile()
+    file.read(args.file)
+
+    outf = args.to if args.to != '-' else sys.stdout.buffer
+    with outf if isinstance(outf, io.IOBase) else open(outf, 'wb') as tap:
+        writeAllBlocks(file, tap, args.ignore)

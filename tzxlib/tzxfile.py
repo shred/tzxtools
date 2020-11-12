@@ -18,6 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import io
+import sys
+
 from tzxlib.tzxblocks import TzxbBlock
 
 class TzxFile():
@@ -31,9 +34,12 @@ class TzxFile():
         self.version = (TzxFile.MAJOR, TzxFile.MINOR)
         self.blocks = list()
 
-    def read(self, filename):
+    def read(self, input):
         self._reset()
-        with open(filename, 'rb') as tzx:
+        inf = input
+        if isinstance(inf, io.TextIOWrapper):
+            inf = inf.buffer
+        with inf if isinstance(inf, io.IOBase) else open(inf, 'rb') as tzx:
             self.version = self._readHeader(tzx)
             while True:
                 blockType = tzx.read(1)
@@ -42,8 +48,11 @@ class TzxFile():
                 block.read(tzx)
                 self.blocks.append(block)
 
-    def write(self, filename):
-        with open(filename, 'wb') as tzx:
+    def write(self, output):
+        outf = output
+        if isinstance(outf, io.TextIOWrapper):
+            outf = outf.buffer
+        with outf if isinstance(outf, io.IOBase) else open(outf, 'wb') as tzx:
             self._writeHeader(tzx)
             for b in self.blocks:
                 b.write(tzx)

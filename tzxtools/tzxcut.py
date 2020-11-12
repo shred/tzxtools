@@ -45,23 +45,27 @@ def main():
     parser.add_argument('blocks',
                 nargs='*',
                 help='block numbers and ranges to keep')
-    parser.add_argument('-i',
-                '--from',
+    parser.add_argument('-i', '--from',
                 dest='file',
                 metavar='SOURCE',
-                default='/dev/stdin',
+                type=argparse.FileType('rb'),
+                default=(None if sys.stdin.isatty() else sys.stdin.buffer),
                 help='source TZX file, stdin if omitted')
-    parser.add_argument('-o',
-                '--to',
+    parser.add_argument('-o', '--to',
                 dest='to',
                 metavar='TARGET',
-                default='/dev/stdout',
+                type=argparse.FileType('wb'),
+                default=sys.stdout.buffer,
                 help='target TZX file, stdout if omitted')
     parser.add_argument('-v', '--invert',
                 dest='invert',
                 action='store_true',
                 help='do not keep, but remove the blocks')
     args = parser.parse_args()
+
+    if args.file is None:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     file = TzxFile()
     file.read(args.file)

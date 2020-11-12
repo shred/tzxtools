@@ -20,6 +20,7 @@
 #
 
 import argparse
+import io
 import sys
 from time import time
 import wave
@@ -53,11 +54,14 @@ def main():
     parser = argparse.ArgumentParser(description='Generates TZX from WAV file')
     parser.add_argument('file',
                 nargs='?',
+                type=argparse.FileType('rb'),
+                default=(None if sys.stdin.isatty() else sys.stdin.buffer),
                 help='WAV file')
     parser.add_argument('-o', '--to',
                 dest='to',
                 metavar='TARGET',
-                default='/dev/stdout',
+                type=argparse.FileType('wb'),
+                default=sys.stdout.buffer,
                 help='target file, stdout if omitted')
     parser.add_argument('-p', '--progress',
                 dest='progress',
@@ -107,6 +111,10 @@ def main():
 
     args = parser.parse_args()
 
+    if args.file is None:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
     loader = TapeLoader(debug=args.debug,
             treshold=tresholds[args.treshold],
             tolerance=tolerances[args.tolerance],
@@ -119,7 +127,7 @@ def main():
     try:
         tzx = loader.load(args.file, startFrame=args.start, endFrame=args.end)
         file = args.to
-        if not file.lower().endswith('.tzx'):
+        if not isinstance(file, io.IOBase) and not file.lower().endswith('.tzx'):
             file += '.tzx'
         tzx.write(file)
     except KeyboardInterrupt:

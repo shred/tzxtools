@@ -20,6 +20,7 @@
 #
 
 import argparse
+import sys
 
 from tzxlib.tzxfile import TzxFile
 
@@ -27,10 +28,13 @@ def main():
     parser = argparse.ArgumentParser(description='Merges TZX files')
     parser.add_argument('files',
                 nargs='+',
+                type=argparse.FileType('rb'),
+                default=sys.stdin.buffer,
                 help='TZX files to merge')
     parser.add_argument('-o', '--to',
                 metavar='TARGET',
-                default='/dev/stdout',
+                type=argparse.FileType('wb'),
+                default=sys.stdout.buffer,
                 help='target TZX file, stdout if omitted')
     args = parser.parse_args()
 
