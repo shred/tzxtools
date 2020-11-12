@@ -103,11 +103,11 @@ def main():
     parser.add_argument('-t', '--text',
                 dest='text',
                 action='store_true',
-                help='convert ZX Spectrum text to UTF-8')
+                help='convert ZX Spectrum text to plain text')
     parser.add_argument('-B', '--basic',
                 dest='basic',
                 action='store_true',
-                help='convert ZX Spectrum BASIC to UTF-8 text')
+                help='convert ZX Spectrum BASIC to plain text')
     parser.add_argument('-A', '--assembler',
                 dest='assembler',
                 action='store_true',

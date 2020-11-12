@@ -22,8 +22,8 @@ tzxcat [-h] [-b NR] [-o TARGET] [-s BYTES] [-l BYTES]
 
 A converter can be applied to the output. If no converter is chosen, the output is just the binary content of the selected block. Available converters are:
 
-* `-t`, `--text`: Convert ZX Spectrum text to UTF-8.
-* `-B`, `--basic`: Convert ZX Spectrum BASIC to plain UTF-8 text. The result is what you would see on the screen after a `LIST` command. Inline attribute changes are ignored though.
+* `-t`, `--text`: Convert ZX Spectrum text to plain text.
+* `-B`, `--basic`: Convert ZX Spectrum BASIC to plain text. The result is what you would see on the screen after a `LIST` command. Inline attribute changes are ignored though.
 * `-A`, `--assembler`: Disassemble the block, using a simple Z80 disassembler. Undocumented Z80 op codes and Z80N (ZX Spectrum Next) op codes are supported. The disassembler also supports the `exit` and `break` pseudo op codes of the #CSpect emulator.
 * `-S`, `--screen`: Convert a ZX Spectrum SCREEN$ to PNG. It is recommended to select the SCREEN block using the `--block` option.
 * `-d`, `--dump`: Generate a hex dump of the block contents.
@@ -31,6 +31,8 @@ A converter can be applied to the output. If no converter is chosen, the output 
 Additional converter options:
 
 * `-O`, `--org`: Define the base address for hex dumps and disassembled code. If not given, the starting address given in the previous `Bytes` header is used automatically. If there is no such header, 0 is assumed as base address.
+
+Converters use your system's encoding as target encoding. If your system does not use Unicode, the presence of some special characters may lead to an error.
 
 ## Example
 

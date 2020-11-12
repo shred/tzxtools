@@ -20,6 +20,7 @@
 #
 
 import os
+from sys import getdefaultencoding
 from struct import unpack
 from tzxlib.z80dis import disassemble
 
@@ -83,7 +84,7 @@ def decodeBasicLine(line):
     return result
 
 def convertToText(data, out, org=0):
-    out.write(convertCR(data).replace('\n', os.linesep).encode('utf-8'))
+    out.write(convertCR(data).replace('\n', os.linesep).encode(getdefaultencoding()))
 
 def convertToBasic(data, out, org=0):
     pos = 0
@@ -94,7 +95,7 @@ def convertToBasic(data, out, org=0):
         if pos + lineLen + 4 > end:
             break
         line = '%4d%s' % (lineNum, decodeBasicLine(unpack('%dB' % (lineLen), data[pos + 4 : pos + 4 + lineLen])))
-        out.write(line.replace('\n', os.linesep).encode('utf-8'))
+        out.write(line.replace('\n', os.linesep).encode(getdefaultencoding()))
         pos += lineLen + 4
 
 def convertToDump(data, out, org=0, bytesPerRow=16):
@@ -120,7 +121,7 @@ def convertToDump(data, out, org=0, bytesPerRow=16):
         line += '| '
         line += text
         line += os.linesep
-        out.write(line.replace('\n', os.linesep).encode('utf-8'))
+        out.write(line.replace('\n', os.linesep).encode(getdefaultencoding()))
         pos += bytesPerRow
 
 def convertToAssembler(data, out, org=0):
@@ -142,7 +143,7 @@ def convertToAssembler(data, out, org=0):
         line += ' '
         line += ins
         line += os.linesep
-        out.write(line.replace('\n', os.linesep).encode('utf-8'))
+        out.write(line.replace('\n', os.linesep).encode(getdefaultencoding()))
         pos += length
 
 def convertToScreen(data, out, org=0):
