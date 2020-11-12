@@ -19,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import os
 from struct import unpack
 from tzxlib.z80dis import disassemble
 
@@ -39,7 +40,7 @@ UPPER = [ ' ', '▝', '▘', '▀', '▗', '▐', '▚', '▜', '▖', '▞', '�
     ' RANDOMIZE ', ' IF ', ' CLS ', ' DRAW ', ' CLEAR ', ' RETURN ', ' COPY ' ]
 
 def convChar(ch, noLeadingSpace=False):
-    if ch == 0x0D:   return '\n'
+    if ch == 0x0D:   return os.linesep
     elif ch >= 0x80:
         result = UPPER[ch - 0x80]
         if noLeadingSpace and ch >= 0xA5 and result[0] == ' ':
@@ -58,7 +59,7 @@ def convert(data):
             result += convChar(d, result[-1:] == ' ')
     return result
 
-def convertToText(data):
+def convertCR(data):
     result = ''
     for d in data:
         if d >= 0x20 or d == 0x0D:
@@ -81,6 +82,9 @@ def decodeBasicLine(line):
             result += convChar(ch, result[-1:] == ' ')
     return result
 
+def convertToText(data, out, org=0):
+    out.write(convertCR(data).replace('\n', os.linesep).encode('utf-8'))
+
 def convertToBasic(data, out, org=0):
     pos = 0
     end = len(data)
@@ -90,7 +94,7 @@ def convertToBasic(data, out, org=0):
         if pos + lineLen + 4 > end:
             break
         line = '%4d%s' % (lineNum, decodeBasicLine(unpack('%dB' % (lineLen), data[pos + 4 : pos + 4 + lineLen])))
-        out.write(line.encode('utf-8'))
+        out.write(line.replace('\n', os.linesep).encode('utf-8'))
         pos += lineLen + 4
 
 def convertToDump(data, out, org=0, bytesPerRow=16):
@@ -115,8 +119,8 @@ def convertToDump(data, out, org=0, bytesPerRow=16):
                 line += '   '
         line += '| '
         line += text
-        line += '\n'
-        out.write(line.encode('utf-8'))
+        line += os.linesep
+        out.write(line.replace('\n', os.linesep).encode('utf-8'))
         pos += bytesPerRow
 
 def convertToAssembler(data, out, org=0):
@@ -137,8 +141,8 @@ def convertToAssembler(data, out, org=0):
                 line += '   '
         line += ' '
         line += ins
-        line += '\n'
-        out.write(line.encode('utf-8'))
+        line += os.linesep
+        out.write(line.replace('\n', os.linesep).encode('utf-8'))
         pos += length
 
 def convertToScreen(data, out, org=0):

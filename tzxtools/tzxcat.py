@@ -142,7 +142,7 @@ def main():
     elif args.screen:
         converter = convertToScreen
     elif args.text:
-        converter = lambda data, out, org: out.write(convertToText(data).encode('utf-8'))
+        converter = convertToText
     elif args.dump:
         converter = convertToDump
 

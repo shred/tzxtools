@@ -406,7 +406,7 @@ class TzxbArchiveInfo(TzxbBlock):
             result += self.identifications[tp] if 0 <= tp < len(self.identifications) else 'Comment'
             result += ': '
             result += self.data[ix+2:ix+2+tl].decode('ISO-8859-15').replace('\r', '\n').replace('\n', '\n\t').strip()
-            result += '\n'
+            result += os.linesep
             ix += 2 + tl
         return result
 
