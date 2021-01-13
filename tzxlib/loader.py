@@ -22,6 +22,7 @@ from collections import deque
 from struct import unpack
 import sys
 import wave
+import datetime
 
 from tzxlib.tapfile import TapFile, TapHeader, TapData
 from tzxlib.tzxblocks import TzxbData
@@ -66,8 +67,9 @@ class TapeLoader():
                     (tzxData, startPos, endPos) = self._loadBlock()
                     tzxbd.setup(tzxData)
                     tzx.blocks.append(tzxbd)
-                    if self.verbose:
-                        print(('Frame {:9d} - {:9d}: {}').format(
+                    if self.verbose and len(tzxData.data) > 10:        # skip short data
+                        print(('{} {:9d} - {:9d} : {}').format(
+                             str(datetime.timedelta(seconds=self.samples.toSeconds(startPos))),      # show time
                              startPos,
                              endPos,
                              str(tzxbd)
@@ -296,7 +298,7 @@ class TapeLoader():
 
         while self.samples[count] > bias:
             count += 1
-            if count > countH:
+            if count > countH or count >= self.samples.maxlen:       # Added or condition else somtimes fatal index error
                 if self.debug >= 4:
                     print(' ! {} no wave end in range, count={}, bias={}'.format(tag, count, bias), file=sys.stderr)
                 return None
@@ -419,6 +421,10 @@ class TapeReader():
     def toTStates(self, frames):
         """ Converts number of frames to T-States """
         return int(frames * self.cpufreq / self.wav.getframerate())
+
+    def toSeconds(self, frames):
+        """ Converts number of frames to seconds """
+        return int(frames  / self.wav.getframerate())
 
     def toFrames(self, tCycles):
         """ Converts T-States to number of frames """

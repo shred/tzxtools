@@ -18,13 +18,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import hexdump
 from struct import pack, unpack
 
 from tzxlib.convert import convert
+from tzxlib.convert import convertToDump
+
 
 class TapFile():
     def create(data):
-        if len(data) == 19 and data[0] == 0x00:
+        if (len(data) == 19 or len(data) == 20) and data[0] == 0x00:        # Headers also allowd 20 bytes long
             return TapHeader(data)
         else:
             return TapData(data)
@@ -89,6 +92,7 @@ class TapHeader(TapFile):
             result = '%s: %s (%s bytes)' % (self.type(), self.name(), self.length())
         if not self.valid():
             result += ', CRC ERROR!'
+            result += " " + hexdump.hexdump(bytes(self.data)[:16], result='return')             # show 16 byte hexdump
         return result
 
 
@@ -108,4 +112,9 @@ class TapData(TapFile):
             result = '%d bytes of data' % (len(self.data) - 2)
         if not self.valid():
             result += ', CRC ERROR!'
+        # or use convertToDump?
+        #r = string()
+        #convertToDump(self.data, r)
+        #result += " " + r
+        result += " " + hexdump.hexdump(bytes(self.data)[:16], result='return')             # show 16 byte hexdump
         return result

@@ -23,6 +23,7 @@ import argparse
 import sys
 
 from tzxlib.tzxfile import TzxFile
+from tzxlib.tapfile import TapHeader
 
 def main():
     parser = argparse.ArgumentParser(description='Remove all noise, idealize the data')
@@ -41,6 +42,10 @@ def main():
                 dest='stripcrc',
                 action='store_true',
                 help='also remove blocks with bad CRC')
+    parser.add_argument('-H', '--headermustmatch',
+                dest='headermustmatch',
+                action='store_true',
+                help='also remove blocks not proceded by matching header')
     args = parser.parse_args()
 
     if args.file is None:
@@ -50,38 +55,63 @@ def main():
     fout = TzxFile()
     crcCnt = 0
     noiseCnt = 0
+    headerlessCnt = 0
 
     file = TzxFile()
     file.read(args.file)
+    numbytes = 0
+    blocklengthfromheader = 0
     for b in file.blocks:
         # Convert Turbo blocks to standard timed blocks if possible
-        if b.id == 0x11:
+        if b.id == 0x11:        # turbo data
             b = b.asData()
+        
+        if args.headermustmatch and b.id == 0x10 and b.valid() and isinstance(b.tap, TapHeader) :
+            lastheader = b
+            blocklengthfromheader = lastheader.tap.length()
+            
 
         # Use all data blocks for the output
         if b.id in [0x10, 0x11, 0x14]:
             if not b.valid():
                 crcCnt += 1
-            if b.valid() or not args.stripcrc:
-                fout.blocks.append(b)
+            if b.valid() or not args.stripcrc:           
+                if (blocklengthfromheader == len(b.tap.data) - 2 and not isinstance(b.tap, TapHeader)) or not args.headermustmatch:
+                    if args.headermustmatch:                # else witten as normal block
+                        fout.blocks.append(lastheader)   
+                    fout.blocks.append(b)
+                    numbytes += len(b.tap.data)
+                elif not isinstance(b.tap, TapHeader):
+                    headerlessCnt = headerlessCnt + 1
+                    
+                if not isinstance(b.tap, TapHeader):                    
+                    blocklengthfromheader = 0
             continue
+
+        blocklengthfromheader = 0                
+
 
         # Use all pause blocks if they mean "stop the tape"
         if b.id in [0x20, 0x2A]:
             if b.id != 0x20 or b.length() == 0:
                 fout.blocks.append(b)
+                numbytes += len(b.tap.data)
             continue
 
         # Use all meta blocks
         if b.id not in [0x12, 0x13, 0x15, 0x18, 0x19]:
             fout.blocks.append(b)
+            numbytes += len(b.tap.data)
             continue
 
         noiseCnt += 1
 
     fout.write(args.to)
 
-    print('Blocks found:           %3d' % (len(file.blocks)), file=sys.stderr)
-    print('Noise blocks removed:   %3d' % (noiseCnt), file=sys.stderr)
-    print('Blocks with CRC errors: %3d' % (crcCnt), file=sys.stderr)
-    print('Blocks written:         %3d' % (len(fout.blocks)), file=sys.stderr)
+    print('Blocks found:              %3d' % (len(file.blocks)), file=sys.stderr)
+    print('Noise blocks removed:      %3d' % (noiseCnt), file=sys.stderr)
+    print('Blocks with CRC errors:    %3d' % (crcCnt), file=sys.stderr)
+#    if(args.headermustmatch)
+    print('Skipped headerless blocks: %3d' % (headerlessCnt), file=sys.stderr)
+    print('Blocks written:            %3d' % (len(fout.blocks)), file=sys.stderr)
+    print('Total bytes written:       %3d' % (numbytes), file=sys.stderr)        # DJS

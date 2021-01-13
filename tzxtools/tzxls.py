@@ -41,6 +41,10 @@ def main():
                 dest='verbose',
                 action='store_true',
                 help='show content of information blocks')
+    parser.add_argument('-w', '--wide',
+                dest='printwide',
+                action='store_true',
+                help='output horizontal, comma separated')
     args = parser.parse_args()
 
     files = list(args.file)
@@ -59,14 +63,17 @@ def main():
         tzx.read(f)
 
         cnt = 0
+        endm = "\n"
+        if args.printwide:
+            endm = ", "
         for b in tzx.blocks:
             if args.short:
                 if hasattr(b, 'tap') and isinstance(b.tap, TapHeader):
-                    print('%s: %s' % (b.tap.type(), b.tap.name()))
+                    print('%s: %s' % (b.tap.type(), b.tap.name().strip() ), end=endm)
             else:
-                print('%3d  %-27s %s' % (cnt, b.type, str(b)))
+                print('%3d  %-27s %s' % (cnt, b.type, str(b)), end=endm)
             if args.verbose:
                 info = b.info()
                 if info is not None:
-                    print(textwrap.indent(info.strip(), '\t'))
+                    print(textwrap.indent(info.strip(), '\t'), end=endm)
             cnt += 1
