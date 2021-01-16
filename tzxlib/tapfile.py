@@ -26,6 +26,7 @@ from tzxlib.convert import convertToDump
 
 
 class TapFile():
+    showHexSample = False
     def create(data):
         if (len(data) == 19 or len(data) == 20) and data[0] == 0x00:        # Headers also allowd 20 bytes long
             return TapHeader(data)
@@ -50,6 +51,7 @@ class TapFile():
     def writeFragment(self, tzx):
         tzx.write(pack('<H', len(self.data)))
         tzx.write(self.data)
+
 
 
 class TapHeader(TapFile):
@@ -92,8 +94,10 @@ class TapHeader(TapFile):
             result = '%s: %s (%s bytes)' % (self.type(), self.name(), self.length())
         if not self.valid():
             result += ', CRC ERROR!'
-            result += " " + hexdump.hexdump(bytes(self.data)[:16], result='return')             # show 16 byte hexdump
+        if TapFile.showHexSample:
+            result += " " * (32 - len(result)) + hexdump.hexdump(bytes(self.data)[:16], result='return')[10:]           # show 16 byte hexdump
         return result
+
 
 
 class TapData(TapFile):
@@ -112,9 +116,6 @@ class TapData(TapFile):
             result = '%d bytes of data' % (len(self.data) - 2)
         if not self.valid():
             result += ', CRC ERROR!'
-        # or use convertToDump?
-        #r = string()
-        #convertToDump(self.data, r)
-        #result += " " + r
-        result += " " + hexdump.hexdump(bytes(self.data)[:16], result='return')             # show 16 byte hexdump
+        if TapFile.showHexSample:
+            result += " " * (32 - len(result)) + hexdump.hexdump(bytes(self.data)[:16], result='return')[10:]             # show 16 byte hexdump
         return result

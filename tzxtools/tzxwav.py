@@ -108,8 +108,12 @@ def main():
                 dest='debug',
                 action='count',
                 help='enable debug output, give multiple times to increase verbosity')
-
+    parser.add_argument('-X', '--hexdump',
+                dest='hexdump',
+                action='store_true',
+                help='Show 16 byte sample hexdump after block data')                  
     args = parser.parse_args()
+    TapFile.showHexSample = args.hexdump
 
     if args.file is None:
         parser.print_help(sys.stderr)

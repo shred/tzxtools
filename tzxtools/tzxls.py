@@ -24,7 +24,7 @@ import io
 import sys
 import textwrap
 
-from tzxlib.tapfile import TapHeader
+from tzxlib.tapfile import TapHeader, TapFile
 from tzxlib.tzxfile import TzxFile
 
 def main():
@@ -45,7 +45,12 @@ def main():
                 dest='printwide',
                 action='store_true',
                 help='output horizontal, comma separated')
+    parser.add_argument('-X', '--hexdump',
+                dest='hexdump',
+                action='store_true',
+                help='Show 16 byte sample hexdump after block data')
     args = parser.parse_args()
+    TapFile.showHexSample = args.hexdump
 
     files = list(args.file)
     if not sys.stdin.isatty() and len(files) == 0:
@@ -63,13 +68,13 @@ def main():
         tzx.read(f)
 
         cnt = 0
-        endm = "\n"
+        endm = "\n"     # endmarker either \n or ,
         if args.printwide:
             endm = ", "
         for b in tzx.blocks:
             if args.short:
                 if hasattr(b, 'tap') and isinstance(b.tap, TapHeader):
-                    print('%s: %s' % (b.tap.type(), b.tap.name().strip() ), end=endm)
+                    print('%s: %s (%s)' % (b.tap.type(), b.tap.name().strip(), b.tap.length() ), end=endm)
             else:
                 print('%3d  %-27s %s' % (cnt, b.type, str(b)), end=endm)
             if args.verbose:
