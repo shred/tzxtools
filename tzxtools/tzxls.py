@@ -68,17 +68,20 @@ def main():
         tzx.read(f)
 
         cnt = 0
-        endm = "\n"     # endmarker either \n or ,
-        if args.printwide:
-            endm = ", "
+        sep = ""     # endmarker either \n or ,
         for b in tzx.blocks:
             if args.short:
                 if hasattr(b, 'tap') and isinstance(b.tap, TapHeader):
-                    print('%s: %s (%s)' % (b.tap.type(), b.tap.name().strip(), b.tap.length() ), end=endm)
+                    print('%s%s: %s (%s)' % (sep, b.tap.type(), b.tap.name().strip(), b.tap.length() ), end="")
             else:
-                print('%3d  %-27s %s' % (cnt, b.type, str(b)), end=endm)
+                print('%s%3d  %-27s %s' % (sep, cnt, b.type, str(b)), end="")
             if args.verbose:
                 info = b.info()
                 if info is not None:
-                    print(textwrap.indent(info.strip(), '\t'), end=endm)
+                    print(textwrap.indent(info.strip(), '\t'), end="")
             cnt += 1
+            if args.printwide:
+                sep = ", "
+            else: 
+                sep = "\n"     # endmarker either \n or ,
+        print("")              # extra \n

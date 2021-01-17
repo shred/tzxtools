@@ -298,7 +298,7 @@ class TapeLoader():
 
         while self.samples[count] > bias:
             count += 1
-            if count > countH or count >= self.samples.maxlen:       # Added or condition else somtimes fatal index error
+            if count > countH or count >= self.samples.maxlen:       # Added count >= self.samples.maxlen else sometimes fatal index error
                 if self.debug >= 4:
                     print(' ! {} no wave end in range, count={}, bias={}'.format(tag, count, bias), file=sys.stderr)
                 return None
