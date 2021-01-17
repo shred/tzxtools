@@ -24,6 +24,7 @@ import io
 import sys
 from time import time
 import wave
+from tzxlib.tapfile import TapFile
 
 from tzxlib.loader import TapeLoader
 
