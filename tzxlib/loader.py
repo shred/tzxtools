@@ -67,7 +67,7 @@ class TapeLoader():
                     (tzxData, startPos, endPos) = self._loadBlock()
                     tzxbd.setup(tzxData)
                     tzx.blocks.append(tzxbd)
-                    if self.verbose and len(tzxData.data) > 10:        # skip short data
+                    if self.verbose: 
                         print(('{} {:9d} - {:9d} : {}').format(
                              str(datetime.timedelta(seconds=self.samples.toSeconds(startPos))),      # show time
                              startPos,
