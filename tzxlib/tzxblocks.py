@@ -21,6 +21,7 @@
 from struct import pack, unpack
 
 from tzxlib.tapfile import TapFile
+from tzxlib.saver import TapeSaver
 
 class TzxbBlock():
     blockTypes = {
@@ -80,6 +81,9 @@ class TzxbBlock():
     def info(self):
         return None
 
+    def playback(self, saver:TapeSaver):
+        yield from ()
+
     def __str__(self):
         return ''
 
@@ -106,6 +110,10 @@ class TzxbData(TzxbBlock):
 
     def dump(self):
         return self.tap.body()
+
+    def playback(self, saver:TapeSaver):
+        yield from saver.saveTapFile(self.tap)
+        yield from saver.pause(unpack('<H', self.data[0x00:0x02])[0])
 
     def __str__(self):
         return str(self.tap)
@@ -148,6 +156,13 @@ class TzxbTurboData(TzxbBlock):
     def dump(self):
         return self.tap.body()
 
+    def playback(self, saver:TapeSaver):
+        (pilot, sync1, sync2, zerobit, onebit, tone, bits) = unpack('<HHHHHHB', self.data[0x00:0x0D])
+        yield from saver.saveTapFile(self.tap,
+            pilotPulse=pilot, syncHiPulse=sync1, syncLoPulse=sync2,
+            zeroPulse=zerobit, onePulse=onebit, leaderTone=tone, finalBits=bits)
+        yield from saver.pause(unpack('<H', self.data[0x0D:0x0F])[0])
+
     def __str__(self):
         return str(self.tap)
 
@@ -162,6 +177,10 @@ class TzxbPureTone(TzxbBlock):
     def info(self):
         return '%d x %d T-states' % unpack('<HH', self.data)
 
+    def playback(self, saver:TapeSaver):
+        (length, number) = unpack('<HH', self.data[0x00:0x04])
+        yield from saver.tone(length, number)
+
 
 class TzxbPulseSequence(TzxbBlock):
     id = 0x13
@@ -174,6 +193,11 @@ class TzxbPulseSequence(TzxbBlock):
 
     def info(self):
         return '{} pulses'.format((len(self.data)-1) // 2)
+
+    def playback(self, saver:TapeSaver):
+        for i in range(1, len(self.data), 2):
+            length = unpack('<H', self.data[i:i+2])[0]
+            yield from saver.pulse(length)
 
 
 class TzxbPureData(TzxbBlock):
@@ -196,6 +220,13 @@ class TzxbPureData(TzxbBlock):
     def dump(self):
         return self.tap.body()
 
+    def playback(self, saver:TapeSaver):
+        (zerobit, onebit, bits, pause) = unpack('<HHBH', self.data[0x00:0x07])
+        yield from saver.saveTapFile(self.tap,
+            pilotPulse=None, syncHiPulse=None, syncLoPulse=None,
+            zeroPulse=zerobit, onePulse=onebit, finalBits=bits)
+        yield from saver.pause(pause)
+
     def __str__(self):
         return str(self.tap)
 
@@ -210,6 +241,11 @@ class TzxbDirectRecording(TzxbBlock):
         len = len[2] << 16 | len[1] << 8 | len[0]
         self.data += tzx.read(len)
 
+    def playback(self, saver:TapeSaver):
+        (tstates, pause, bits) = unpack('<HHB', self.data[0x00:0x05])
+        yield from saver.saveDirect(self.data[0x08:], bits, tstates)
+        yield from saver.pause(pause)
+
 
 class TzxbC64Data(TzxbBlock): # deprecated
     id = 0x16
@@ -222,6 +258,9 @@ class TzxbC64Data(TzxbBlock): # deprecated
 
     def dump(self):
         return self.data[0x28:]
+
+    def playback(self, saver:TapeSaver):
+        raise NotImplementedError('C64 blocks are not supported')
 
 
 class TzxbC64TurboData(TzxbBlock): # deprecated
@@ -236,15 +275,24 @@ class TzxbC64TurboData(TzxbBlock): # deprecated
     def dump(self):
         return self.data[0x16:]
 
+    def playback(self, saver:TapeSaver):
+        raise NotImplementedError('C64 blocks are not supported')
+
 
 class TzxbCswRecording(TzxbBlock):
     id = 0x18
     type = 'CSW recording'
 
+    def playback(self, saver:TapeSaver):
+        raise NotImplementedError('CSW Recording Block is not supported yet')
+
 
 class TzxbGeneralizedData(TzxbBlock):
     id = 0x19
     type = 'Generalized data'
+
+    def playback(self, saver:TapeSaver):
+        raise NotImplementedError('Generalized Data Block is not supported yet')
 
 
 class TzxbPause(TzxbBlock):
@@ -257,8 +305,14 @@ class TzxbPause(TzxbBlock):
     def length(self):
         return unpack('<H', self.data)[0]
 
+    def stopTheTape(self):
+        return self.length() == 0
+
     def info(self):
         return '%d ms' % (self.length())
+
+    def playback(self, saver:TapeSaver):
+        yield from saver.pause(self.length())
 
 
 class TzxbGroupStart(TzxbBlock):
@@ -289,8 +343,11 @@ class TzxbJumpTo(TzxbBlock):
     def read(self, tzx):
         self.data = tzx.read(0x02)
 
+    def relative(self):
+        return unpack('<h', self.data)[0]
+
     def __str__(self):
-        return str(unpack('<h', self.data)[0])
+        return str(self.relative())
 
 
 class TzxbLoopStart(TzxbBlock):
@@ -300,8 +357,11 @@ class TzxbLoopStart(TzxbBlock):
     def read(self, tzx):
         self.data = tzx.read(0x02)
 
+    def repeats(self):
+        return unpack('<h', self.data)[0]
+
     def __str__(self):
-        return str(unpack('<h', self.data)[0])
+        return str(self.repeats())
 
 
 class TzxbLoopEnd(TzxbBlock):
@@ -472,6 +532,9 @@ class TzxbKansasCityStandard(TzxbBlock):
 
     def info(self):
         return "Data stream: {} bytes".format(len(self.data)-0x10)
+
+    def playback(self, saver:TapeSaver):
+        raise NotImplementedError('Kansas City Standard is not supported')
 
 
 class TzxbGlue(TzxbBlock):

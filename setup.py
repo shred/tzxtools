@@ -61,6 +61,7 @@ setup(
 
     install_requires=[
         'pypng >= 0.0.20',
+        'pyaudio >= 0.2.11',
     ],
 
     entry_points={
@@ -70,6 +71,7 @@ setup(
             'tzxcut=tzxtools.tzxcut:main',
             'tzxls=tzxtools.tzxls:main',
             'tzxmerge=tzxtools.tzxmerge:main',
+            'tzxplay=tzxtools.tzxplay:main',
             'tzxsplit=tzxtools.tzxsplit:main',
             'tzxtap=tzxtools.tzxtap:main',
             'tzxwav=tzxtools.tzxwav:main',

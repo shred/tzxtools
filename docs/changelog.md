@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.7.0 (2021-02-28)
+
+* Add new `tzxplay` tool for playing back TZX files
+
 ## v1.6.0 (2020-11-11)
 
 * Fix `stdin` and `stdout` usage on Windows installations

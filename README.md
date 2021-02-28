@@ -8,6 +8,7 @@ TZX is a common file format for preserving computer tapes of the ZX Spectrum, bu
 
 * Convert your old ZX Spectrum tape recordings into TZX files.
 * List, split, merge, and divide the blocks inside TZX files.
+* Play back TZX files and load them into the real hardware.
 * Extract binary content from TZX blocks.
 * Read hex dumps, disassembled Z80 machine code, or ZX Spectrum BASIC code.
 * Convert ZX Spectrum screens to PNG files.
@@ -30,6 +31,7 @@ pip install tzxtools
 * `tzxcut` - Cuts blocks from a TZX file.
 * `tzxls` - Lists the contents of a TZX file.
 * `tzxmerge` - Concatenates multiple TZX files into one file.
+* `tzxplay` - Plays back a TZX file for loading into a real ZX Spectrum.
 * `tzxsplit` - Splits a TZX file into separate programs.
 * `tzxtap` - Converts a TZX file to TAP file format.
 * `tzxwav` - Converts WAV file ZX Spectrum tape recordings to TZX files.

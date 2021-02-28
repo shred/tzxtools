@@ -38,6 +38,9 @@ class TapFile():
     def body(self):
         return self.data[1:-1]
 
+    def leaderCycles(self):
+        return 3223
+
     def writeBody(self, out):
         out.write(self.body())
 
@@ -78,6 +81,9 @@ class TapHeader(TapFile):
 
     def length(self):
         return unpack('<H', self.data[12:14])[0]
+
+    def leaderCycles(self):
+        return 8063
 
     def __str__(self):
         if (self.data[1] == 3):
