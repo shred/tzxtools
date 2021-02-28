@@ -67,7 +67,13 @@ class TapeLoader():
                     tzxbd.setup(tzxData)
                     tzx.blocks.append(tzxbd)
                     if self.verbose:
-                        print(('Frame {:9d} - {:9d}: {}').format(
+                        startMillis = self.samples.toMilliSeconds(startPos)
+                        startSecs = startMillis // 1000
+                        startMins = startSecs // 60
+                        print(('{:3d}:{:02d}.{:03d} {:9d} - {:9d}: {}').format(
+                             startMins,
+                             startSecs % 60,
+                             startMillis % 1000,
                              startPos,
                              endPos,
                              str(tzxbd)
@@ -419,6 +425,10 @@ class TapeReader():
     def toTStates(self, frames):
         """ Converts number of frames to T-States """
         return int(frames * self.cpufreq / self.wav.getframerate())
+
+    def toMilliSeconds(self, frames):
+        """ Converts number of frames to seconds """
+        return int(frames * 1000 / self.wav.getframerate())
 
     def toFrames(self, tCycles):
         """ Converts T-States to number of frames """

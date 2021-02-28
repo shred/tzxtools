@@ -4,6 +4,7 @@
 
 * Add new `tzxplay` tool for playing back TZX files
 * `tzxcleanup`: Add `--headermustmatch` option (by @oxidaan)
+* `tzxwav`: Verbose output shows tape time of each found block (idea by @oxidaan)
 
 ## v1.6.0 (2020-11-11)
 
