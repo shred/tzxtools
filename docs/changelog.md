@@ -3,6 +3,7 @@
 ## v1.7.0 (2021-02-28)
 
 * Add new `tzxplay` tool for playing back TZX files
+* `tzxcleanup`: Add `--headermustmatch` option (by @oxidaan)
 
 ## v1.6.0 (2020-11-11)
 

@@ -17,6 +17,7 @@ tzxcleanup [-h] [-o TARGET] [-c] [file]
 * `file`: TZX file to read from, or `stdin` if not given.
 * `-o`, `--to`: Target file. If omitted, `stdout` is used.
 * `-c`, `--stripcrc`: Also remove all data blocks with a bad CRC. They would usually lead to a "tape loading error".
+* `-H`, `--headermustmatch`: Remove all blocks that are not preceeded by a matching header.
 * `-h`, `--help`: Show help message and exit.
 
 ## Example
