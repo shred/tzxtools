@@ -30,6 +30,7 @@ pip install tzxtools
 * [`tzxcut`](tzxcut.md) - Cuts blocks from a TZX file.
 * [`tzxls`](tzxls.md) - Lists the contents of a TZX file.
 * [`tzxmerge`](tzxmerge.md) - Concatenates multiple TZX files into one file.
+* [`tzxplay`](tzxplay.md) - Plays back a TZX file for loading into real hardware.
 * [`tzxsplit`](tzxsplit.md) - Splits a TZX file into separate programs.
 * [`tzxtap`](tzxtap.md) - Converts a TZX file to TAP file format.
 * [`tzxwav`](tzxwav.md) - Converts WAV file ZX Spectrum tape recordings to TZX files.
