@@ -40,7 +40,7 @@ See the [documentation](https://shredzone.org/docs/tzxtools/index.html) for how 
 
 ## TZX and TSX File Format References
 
-The TZX File Format is specified at [World of Spectrum](https://web.archive.org/web/20200418140438/https://www.worldofspectrum.org/TZXformat.html).
+The TZX File Format is specified at [World of Spectrum](https://worldofspectrum.net/features/TZXformat.html).
 
 The TSX "ID 4B - Kansas City Standard" block is not a part of the specification. A documentation can be found at the [makeTSX wiki](https://github.com/nataliapc/makeTSX/wiki/Tutorial-How-to-generate-TSX-files#14-the-new-4b-block).
 
