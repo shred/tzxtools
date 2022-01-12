@@ -23,6 +23,13 @@ All the _tzxtools_ are written in Python 3.
 pip install tzxtools
 ```
 
+On MacOS X, [PortAudio](http://www.portaudio.com/) needs to be installed before:
+
+```sh
+brew install portaudio
+pip3 install tzxtools
+```
+
 ## The Tools
 
 * [`tzxcat`](tzxcat.md) - Extracts data from a TZX file. Optionally disassembles, hex dumps or converts blocks to PNG.
