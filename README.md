@@ -15,6 +15,7 @@ TZX is a common file format for preserving computer tapes of the ZX Spectrum, bu
 * Generate TAP files for ZX Spectrum Next and some emulators.
 * Disassembler also supports all undocumented Z80 instructions and Z80N (ZX Spectrum Next) instructions.
 * Also supports TSX Kansas City Standard blocks.
+* All tools can also read TAP files.
 
 ## Installation
 
@@ -45,11 +46,13 @@ pip3 install tzxtools
 
 See the [documentation](https://shredzone.org/docs/tzxtools/index.html) for how the tools are used.
 
-## TZX and TSX File Format References
+## File Format References
 
 The TZX File Format is specified at [World of Spectrum](https://worldofspectrum.net/features/TZXformat.html).
 
 The TSX "ID 4B - Kansas City Standard" block is not a part of the specification. A documentation can be found at the [makeTSX wiki](https://github.com/nataliapc/makeTSX/wiki/Tutorial-How-to-generate-TSX-files#14-the-new-4b-block).
+
+The TAP File Format is described at [Sinclair Wiki](https://sinclair.wiki.zxnet.co.uk/wiki/TAP_format).
 
 ## Contribute
 

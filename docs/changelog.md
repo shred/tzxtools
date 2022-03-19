@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.8.0 (2022-03-19)
+
+* All tools can now also read TAP files
+
 ## v1.7.0 (2021-02-28)
 
 * Add new `tzxplay` tool for playing back TZX files

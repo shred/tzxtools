@@ -6,6 +6,8 @@ Ths tool shows the block numbers, block types and some block contents of a TZX f
 
 For ZX Spectrum TZX files, it also shows header contents (like program names or data types). Note that CRC checks only apply for ZX Spectrum files. For other machines, this tool will always report false CRC errors.
 
+This tool also accepts TAP files. They are converted to TZX format internally.
+
 ## Usage
 
 ```

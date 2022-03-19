@@ -6,6 +6,8 @@ This tool is useful to migrate tape computer files to modern computers.
 
 It also brings a set of converters to ZX Spectrum BASIC, assembler, ZX Spectrum screens, plain text and hex dump.
 
+This tool also accepts TAP files. They are converted to TZX format internally.
+
 ## Usage
 
 ```

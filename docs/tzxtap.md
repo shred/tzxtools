@@ -6,6 +6,7 @@ This tool is useful to convert TZX files to the TAP file format. Some emulators 
 
 Note that only Standard Speed Data Blocks can be used in TAP files. `tzxtap` stops with an error if it discovers other block types in the TZX file, unless the `--ignore` option is set.
 
+This tool also accepts a TAP file, but will generate an identical TAP file from it.
 
 ## Usage
 

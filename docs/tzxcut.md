@@ -6,6 +6,8 @@ This tool is useful to split the copy of a mixed tape into a separate TZX file f
 
 See also `tzxsplit`.
 
+This tool also accepts a TAP file. It is converted to TZX format internally.
+
 ## Usage
 
 ```

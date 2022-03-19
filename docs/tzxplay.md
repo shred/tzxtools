@@ -8,6 +8,8 @@ Optionally, a WAV file can be generated instead. You can store this WAV file on 
 
 Playback can always be aborted by pressing Ctrl-C.
 
+This tool also accepts a TAP file. It is converted to TZX format internally.
+
 ## Notes
 
 * **TURN DOWN THE SYSTEM VOLUME FIRST!** The output signal is very loud, and may damage your speakers with its rectangle pulses. Make sure to turn down your system volume before using `tzxplay` for the first time.

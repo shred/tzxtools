@@ -8,6 +8,8 @@ It is not necessary to use this tool on the output of [`tzxwav`](tzxwav.md), as 
 
 Use [`tzxcut`](tzxcut.md) to manually clean up all kind of TZX files.
 
+This tool also accepts a TAP file. It is converted to TZX format internally.
+
 ## Usage
 
 ```

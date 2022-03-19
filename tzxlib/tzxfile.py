@@ -19,9 +19,11 @@
 #
 
 import io
+from struct import unpack
 import sys
 
-from tzxlib.tzxblocks import TzxbBlock
+from tzxlib.tapfile import TapFile
+from tzxlib.tzxblocks import TzxbBlock, TzxbData
 
 class TzxFile():
     MAJOR = 1
@@ -39,14 +41,12 @@ class TzxFile():
         inf = input
         if isinstance(inf, io.TextIOWrapper):
             inf = inf.buffer
-        with inf if isinstance(inf, io.IOBase) else open(inf, 'rb') as tzx:
-            self.version = self._readHeader(tzx)
-            while True:
-                blockType = tzx.read(1)
-                if not blockType: break
-                block = TzxbBlock.createBlock(blockType[0])
-                block.read(tzx)
-                self.blocks.append(block)
+        with io.BufferedReader(inf) if isinstance(inf, io.IOBase) else open(inf, 'rb') as tzx:
+            identifier = tzx.peek(8)
+            if identifier[0:7].decode('ascii') != 'ZXTape!' or identifier[7] != 0x1A:
+                self._readTap(tzx)
+            else:
+                self._readTzx(tzx)
 
     def write(self, output):
         outf = output
@@ -56,6 +56,25 @@ class TzxFile():
             self._writeHeader(tzx)
             for b in self.blocks:
                 b.write(tzx)
+
+    def _readTap(self, tap):
+        self.version = (self.MAJOR, self.MINOR)
+        while True:
+            blockLen = tap.read(2)
+            if not blockLen: break
+            len = unpack('<H', blockLen)[0]
+            block = TzxbData()
+            block.setup(TapFile.create(tap.read(len)))
+            self.blocks.append(block)
+
+    def _readTzx(self, tzx):
+        self.version = self._readHeader(tzx)
+        while True:
+            blockType = tzx.read(1)
+            if not blockType: break
+            block = TzxbBlock.createBlock(blockType[0])
+            block.read(tzx)
+            self.blocks.append(block)
 
     def _readHeader(self, tzx):
         header = tzx.read(10)

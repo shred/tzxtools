@@ -14,6 +14,7 @@ TZX is a common file format for preserving computer tapes of the ZX Spectrum, bu
 * Generate TAP files for ZX Spectrum Next and some emulators.
 * Disassembler also supports all undocumented Z80 instructions and Z80N (ZX Spectrum Next) instructions.
 * Also supports TSX Kansas City Standard blocks.
+* All tools can also read TAP files.
 
 ## Installation
 

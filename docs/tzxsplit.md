@@ -10,6 +10,8 @@ If the tape file should not start with a "Program", all blocks up to the first P
 
 See also `tzxcut`.
 
+This tool also accepts a TAP file. It is converted to TZX format internally.
+
 ## Usage
 
 ```
