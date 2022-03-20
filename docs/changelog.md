@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.8.0 (2022-03-19)
+## v1.8.0 (2022-03-20)
 
 * All tools can now also read TAP files
 * Use sounddevice instead of pyaudio (which is not maintained any more)
