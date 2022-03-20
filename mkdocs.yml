@@ -5,7 +5,7 @@ theme:
     name: material
     font: false
     icon:
-        logo: 'fontawesome/solid/save'
+        logo: 'material/cassette'
     palette:
         primary: 'blue'
         accent: 'deep orange'
