@@ -60,8 +60,9 @@ setup(
     packages=['tzxtools', 'tzxlib'],
 
     install_requires=[
+        'numpy >= 1.20.0',
         'pypng >= 0.0.20',
-        'pyaudio >= 0.2.11',
+        'sounddevice >= 0.4.0',
     ],
 
     entry_points={

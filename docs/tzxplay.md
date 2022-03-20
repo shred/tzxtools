@@ -24,8 +24,6 @@ This tool also accepts a TAP file. It is converted to TZX format internally.
 
 * You can use [`tzxcut`](tzxcut.md) to play only a subset of blocks from a TZX file (see example below).
 
-* On some Linux systems, strange ALSA errors may appear on the console when playing back a file. They can be safely ignored. 😉
-
 ## Usage
 
 ```

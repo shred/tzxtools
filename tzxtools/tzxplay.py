@@ -21,7 +21,8 @@
 
 import argparse
 from math import sin, pi
-import pyaudio
+import numpy
+import sounddevice as sd
 import struct
 import sys
 import time
@@ -35,25 +36,34 @@ from tzxlib.saver import TapeSaver
 
 wavelets = {}
 silence = bytes(2048)
+numpySilence = numpy.zeros(1024, dtype=numpy.float32)
 
 
-def wavelet(length, level, sine=False):
+def wavelet(length, level, sine=False, npy=False):
     type = (length, level)
     if type in wavelets:
         return wavelets[type]
 
     sign = 1 if level else -1
-    amp = sign * (min(32767 * (length + 10) / 25, 32767) if sine else 32000)
 
-    wave = bytearray(length*2)
-    for pos in range(length):
-        value = int(amp * sin(pos * pi / length) if sine else amp)
-        wave[pos*2:pos*2+2] = struct.pack('<h', value)
-    wavelets[type] = bytes(wave)
+    if npy:
+        amp = sign * (min(32767 * (length + 10) / 25, 32767) if sine else 32000) / 32767
+        wave = numpy.empty(length, dtype=numpy.float32)
+        for pos in range(length):
+            wave[pos] = amp * sin(pos * pi / length) if sine else amp
+        wavelets[type] = wave
+
+    else:
+        amp = sign * (min(32767 * (length + 10) / 25, 32767) if sine else 32000)
+        wave = bytearray(length*2)
+        for pos in range(length):
+            value = int(amp * sin(pos * pi / length) if sine else amp)
+            wave[pos*2:pos*2+2] = struct.pack('<h', value)
+            wavelets[type] = bytes(wave)
     return wavelets[type]
 
 
-def streamAudio(tzx:TzxFile, rate=44100, stopAlways=False, stop48k=False, sine=False, cpufreq=3500000, verbose=False):
+def streamAudio(tzx:TzxFile, rate=44100, stopAlways=False, stop48k=False, sine=False, cpufreq=3500000, verbose=False, npy=False):
     saver = TapeSaver(cpufreq)
 
     block = 0
@@ -112,15 +122,14 @@ def streamAudio(tzx:TzxFile, rate=44100, stopAlways=False, stop48k=False, sine=F
                 newSampleTime = ((realTimeNs * rate) + 500000000) // 1000000000
                 wavelen = newSampleTime - currentSampleTime
                 if currentLevel != lastLevel:
-
-                    yield wavelet(wavelen, currentLevel, sine)
+                    yield wavelet(wavelen, currentLevel, sine, npy)
                 else:
                     while wavelen > 0:
                         if wavelen >= len(silence)//2:
-                            yield silence
+                            yield numpySilence if npy else silence
                             wavelen -= len(silence)//2
                         else:
-                            yield silence[0:wavelen*2]
+                            yield numpy.zeros(wavelen, dtype=numpy.float32) if npy else silence[0:wavelen*2]
                             wavelen = 0
                 lastLevel = currentLevel
                 currentSampleTime = newSampleTime
@@ -179,7 +188,7 @@ def main():
     tzx = TzxFile()
     tzx.read(args.file)
     stream = streamAudio(tzx, rate=args.rate, stopAlways=args.stop, stop48k=args.mode48k,
-                        sine=args.sine, cpufreq=args.clock, verbose=args.verbose)
+                        sine=args.sine, cpufreq=args.clock, verbose=args.verbose, npy=args.to is None)
 
     audiostream = audio = wav = None
 
@@ -195,14 +204,9 @@ def main():
             wav.writeframesraw(silence[0:16])
         else:
             # Audio Playback
-            audio = pyaudio.PyAudio()
-            audiostream = audio.open(output=True, rate=args.rate, channels=1,
-                                    format=pyaudio.paInt16, frames_per_buffer=16384)
-            for b in stream:
-                audiostream.write(b)
-            # Make sure frame buffer is flushed
-            for _ in range(4 * args.rate // len(silence)):
-                audiostream.write(silence)
+            with sd.Stream(samplerate=args.rate, channels=1, latency='high') as out:
+                for b in stream:
+                    out.write(b)
     except KeyboardInterrupt:
         print('', file=sys.stderr)
         print("D BREAK - CONT repeats, 0:1", file=sys.stderr)
