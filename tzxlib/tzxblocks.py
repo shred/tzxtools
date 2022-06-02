@@ -75,6 +75,9 @@ class TzxbBlock():
         tzx.write(bytes([self.id]))
         tzx.write(self.data)
 
+    def writeTap(self, out):
+        raise TapNotSupportedError
+
     def dump(self):
         return None
 
@@ -105,6 +108,10 @@ class TzxbData(TzxbBlock):
         TzxbBlock.write(self, tzx)
         self.tap.write(tzx)
 
+    def writeTap(self, out):
+        self.tap.writeFragment(out)
+        return True
+
     def valid(self):
         return self.tap.valid()
 
@@ -132,6 +139,10 @@ class TzxbTurboData(TzxbBlock):
     def write(self, tzx):
         TzxbBlock.write(self, tzx)
         self.tap.write(tzx)
+
+    def writeTap(self, out):
+        self.tap.writeFragment(out)
+        return True
 
     def valid(self):
         return self.tap.valid()
@@ -213,6 +224,10 @@ class TzxbPureData(TzxbBlock):
     def write(self, tzx):
         TzxbBlock.write(self, tzx)
         self.tap.write(tzx)
+
+    def writeTap(self, out):
+        self.tap.writeFragment(out)
+        return True
 
     def valid(self):
         return self.tap.valid()
@@ -404,6 +419,9 @@ class TzxbStopTape48k(TzxbBlock):
     id = 0x2A
     type = 'Stop the tape (48k)'
 
+    def writeTap(self, out):
+        return False
+
 
 class TzxbSetSignalLevel(TzxbBlock):
     id = 0x2B
@@ -422,6 +440,9 @@ class TzxbTextDescription(TzxbBlock):
         len = unpack('<B', self.data)[0]
         self.data += tzx.read(len)
 
+    def writeTap(self, out):
+        return False
+
     def dump(self):
         return self.data[1:]
 
@@ -437,6 +458,9 @@ class TzxbMessage(TzxbBlock):
         self.data = tzx.read(0x02)
         len = unpack('<xB', self.data)[0]
         self.data += tzx.read(len)
+
+    def writeTap(self, out):
+        return False
 
     def dump(self):
         return self.data[2:]
@@ -457,6 +481,9 @@ class TzxbArchiveInfo(TzxbBlock):
         self.data = tzx.read(0x02)
         len = unpack('<H', self.data)[0]
         self.data += tzx.read(len)
+
+    def writeTap(self, out):
+        return False
 
     def info(self):
         result = ''
@@ -480,6 +507,9 @@ class TzxbHardwareType(TzxbBlock):
         len = unpack('<B', self.data)[0]
         self.data += tzx.read(len * 3)
 
+    def writeTap(self, out):
+        return False
+
 
 class TzxbEmulationInfo(TzxbBlock): # deprecated
     id = 0x34
@@ -497,6 +527,9 @@ class TzxbCustomInfo(TzxbBlock):
         self.data = tzx.read(0x14)
         len = unpack('<L', self.data[0x10:0x14])[0]
         self.data += tzx.read(len)
+
+    def writeTap(self, out):
+        return False
 
     def dump(self):
         return self.data[0x14:]
@@ -546,3 +579,10 @@ class TzxbGlue(TzxbBlock):
 
     def write(self, tzx):
         pass    # never write the glue block, it serves no purpose
+
+    def writeTap(self, out):
+        return False
+
+
+class TapNotSupportedError(Exception):
+    pass

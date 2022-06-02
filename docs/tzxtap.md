@@ -2,9 +2,9 @@
 
 Converts a TZX file to a TAP file.
 
-This tool is useful to convert TZX files to the TAP file format. Some emulators or computers like the _ZX Spectrum Next_ are unable to read TZX files, but accept the simpler and more restricted TAP file format. This tool converts a TZX file into this format.
+This tool is useful to convert TZX files to the TAP file format. Some emulators or computers are unable to read TZX files, but accept TAP files. This tool converts a TZX file into this format.
 
-Note that only Standard Speed Data Blocks can be used in TAP files. `tzxtap` stops with an error if it discovers other block types in the TZX file, unless the `--ignore` option is set.
+TAP files are much simpler than TZX files, as they only support Standard Speed Data Blocks. TZX comment blocks will be skipped with a warning. Other TZX blocks (like those used by speedloaders) will result in an error, because they cannot be converted to the TAP format. You can enforce conversion by using the `--ignore` option, but it is very unlikely that the resulting TAP file can be loaded successfully.
 
 This tool also accepts a TAP file, but will generate an identical TAP file from it.
 
@@ -31,4 +31,4 @@ Read `tape.tzx` and generate a `tape.tap` file from its Standard Speed Data Bloc
 tzxtap --ignore -o tape.tap
 ```
 
-Like above, but ignore all blocks that cannot be used in TAP files.
+Like above, but ignore all blocks that cannot be converted to TAP files.

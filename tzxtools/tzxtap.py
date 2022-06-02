@@ -24,18 +24,22 @@ import io
 import sys
 
 from tzxlib.tzxfile import TzxFile
+from tzxlib.tzxblocks import TapNotSupportedError
 
 def writeBlock(block, out, ignore, index):
-    if not hasattr(block, 'tap'):
-        if ignore:
-            print('Warning: Block %d has no data content, ignored' % (index), file=sys.stderr)
-            return
+    try:
+        if block.writeTap(out):
+            if not block.tap.valid():
+                print('Block %3d: Warning: Bad CRC, may cause tape loading error.' % (index), file=sys.stderr)
         else:
-            print('Error: Block %d has no data content' % (index), file=sys.stderr)
+            print('Block %3d: Comment block was ignored.' % (index), file=sys.stderr)
+    except TapNotSupportedError:
+        if ignore:
+            print('Block %3d: Warning: Block is not supported by TAP format.' % (index), file=sys.stderr)
+        else:
+            print('Block %3d: Error: Block is not supported by TAP format.' % (index), file=sys.stderr)
+            print('Use --ignore option to enforce conversion, but TAP file will be faulty.', file=sys.stderr)
             exit(1)
-    if not block.tap.valid():
-        print('Warning: Block %d has bad CRC' % (index), file=sys.stderr)
-    block.tap.writeFragment(out)
 
 def writeAllBlocks(tzx, out, ignore):
     index = 0
