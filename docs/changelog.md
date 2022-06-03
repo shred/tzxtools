@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.9.0 (2202-06-03)
+
+* `tzxtap`: Skip comment blocks, as the TAP file can be read without them
+
 ## v1.8.0 (2022-03-20)
 
 * All tools can now also read TAP files
