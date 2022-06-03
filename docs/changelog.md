@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.9.0 (2202-06-03)
+## v1.9.0 (2022-06-03)
 
 * `tzxtap`: Skip comment blocks, as the TAP file can be read without them
 
