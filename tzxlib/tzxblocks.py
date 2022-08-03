@@ -19,6 +19,7 @@
 #
 
 from struct import pack, unpack
+import os
 
 from tzxlib.tapfile import TapFile
 from tzxlib.saver import TapeSaver
