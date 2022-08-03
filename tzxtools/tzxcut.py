@@ -44,7 +44,7 @@ def main():
     parser = argparse.ArgumentParser(description='Split into separate programs')
     parser.add_argument('blocks',
                 nargs='*',
-                help='block numbers and ranges to keep')
+                help='block numbers or ranges to keep (range limits are separated by colon)')
     parser.add_argument('-i', '--from',
                 dest='file',
                 metavar='SOURCE',
