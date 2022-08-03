@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.9.1 (2022-08-03)
+
+* `tzxls`: Verbose option threw a Python error, fixed
+
 ## v1.9.0 (2022-06-03)
 
 * `tzxtap`: Skip comment blocks, as the TAP file can be read without them
