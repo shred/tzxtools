@@ -39,7 +39,7 @@ silence = bytes(2048)
 numpySilence = numpy.zeros(1024, dtype=numpy.float32)
 
 
-def wavelet(length, level, sine=False, npy=False):
+def wavelet(length, level, sine=False, npy=False, loudness=0.0):
     type = (length, level)
     if type in wavelets:
         return wavelets[type]
@@ -47,7 +47,7 @@ def wavelet(length, level, sine=False, npy=False):
     sign = 1 if level else -1
 
     if npy:
-        amp = sign * (min(32767 * (length + 10) / 25, 32767) if sine else 32000) / 32767
+        amp = (sign * (min(32767 * (length + 10) / 25, 32767) if sine else 32000) / 32767) * loudness
         wave = numpy.empty(length, dtype=numpy.float32)
         for pos in range(length):
             wave[pos] = amp * sin(pos * pi / length) if sine else amp
@@ -63,8 +63,10 @@ def wavelet(length, level, sine=False, npy=False):
     return wavelets[type]
 
 
-def streamAudio(tzx:TzxFile, rate=44100, stopAlways=False, stop48k=False, sine=False, cpufreq=3500000, verbose=False, npy=False):
+def streamAudio(tzx:TzxFile, rate=44100, stopAlways=False, stop48k=False, sine=False, cpufreq=3500000, verbose=False, npy=False, gaindB=0.0):
     saver = TapeSaver(cpufreq)
+
+    loudness = (gaindB / 1.414 if gaindB > 0 else 1.414 / gaindB) if gaindB != 0.0 else 1.0
 
     block = 0
     repeatBlock = None
@@ -122,7 +124,7 @@ def streamAudio(tzx:TzxFile, rate=44100, stopAlways=False, stop48k=False, sine=F
                 newSampleTime = ((realTimeNs * rate) + 500000000) // 1000000000
                 wavelen = newSampleTime - currentSampleTime
                 if currentLevel != lastLevel:
-                    yield wavelet(wavelen, currentLevel, sine, npy)
+                    yield wavelet(wavelen, currentLevel, sine, npy, loudness)
                 else:
                     while wavelen > 0:
                         if wavelen >= len(silence)//2:
@@ -179,6 +181,12 @@ def main():
                 dest='sine',
                 action='store_true',
                 help='Generate soft sine pulses (square pulses otherwise)')
+    parser.add_argument('-g', '--gain',
+                metavar='GAIN',
+                dest='gaindB',
+                default=0.0,
+                type=float,
+                help='Output gain, in dB (for playback only)')
     args = parser.parse_args()
 
     if args.file is None:
@@ -188,7 +196,8 @@ def main():
     tzx = TzxFile()
     tzx.read(args.file)
     stream = streamAudio(tzx, rate=args.rate, stopAlways=args.stop, stop48k=args.mode48k,
-                        sine=args.sine, cpufreq=args.clock, verbose=args.verbose, npy=args.to is None)
+                        sine=args.sine, cpufreq=args.clock, verbose=args.verbose, npy=args.to is None,
+                        gaindB=args.gaindB)
 
     audiostream = audio = wav = None
 
