@@ -39,7 +39,7 @@ silence = bytes(2048)
 numpySilence = numpy.zeros(1024, dtype=numpy.float32)
 
 
-def wavelet(length, level, sine=False, npy=False, loudness=0.0):
+def wavelet(length, level, sine=False, npy=False, loudness=1.0):
     type = (length, level)
     if type in wavelets:
         return wavelets[type]
