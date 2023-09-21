@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.9.2 (2023-09-21)
+
+* `tzxplay`: Fix crash on zero length wavelets
+
 ## v1.9.1 (2022-08-03)
 
 * `tzxls`: Verbose option threw a Python error, fixed

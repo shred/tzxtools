@@ -121,6 +121,8 @@ def streamAudio(tzx:TzxFile, rate=44100, stopAlways=False, stop48k=False, sine=F
                 realTimeNs += ns
                 newSampleTime = ((realTimeNs * rate) + 500000000) // 1000000000
                 wavelen = newSampleTime - currentSampleTime
+                if wavelen <= 0:
+                    continue
                 if currentLevel != lastLevel:
                     yield wavelet(wavelen, currentLevel, sine, npy)
                 else:
