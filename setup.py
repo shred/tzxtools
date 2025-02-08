@@ -2,7 +2,7 @@
 # tzxtools - a collection for processing tzx files
 #
 # Copyright (C) 2018 Richard "Shred" Körber
-#   https://github.com/shred/tzxtools
+#   https://codeberg.org/shred/tzxtools
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ setup(
     description='A tool collection for processing tzx files',
     long_description=readme(),
     long_description_content_type='text/markdown',
-    url='https://github.com/shred/tzxtools',
+    url='https://codeberg.org/shred/tzxtools',
     keywords='ZX-Spectrum tzx wav',
     license='GPLv3+',
 
@@ -40,8 +40,8 @@ setup(
     author_email='dev@shredzone.de',
 
     project_urls={
-        'Source': 'https://github.com/shred/tzxtools',
-        'Tracker': 'https://github.com/shred/tzxtools/issues',
+        'Source': 'https://codeberg.org/shred/tzxtools',
+        'Tracker': 'https://codeberg.org/shred/tzxtools/issues',
     },
 
     classifiers=[

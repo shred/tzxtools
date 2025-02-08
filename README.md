@@ -56,8 +56,8 @@ The TAP File Format is described at [Sinclair Wiki](https://sinclair.wiki.zxnet.
 
 ## Contribute
 
-* Fork the [Source code at GitHub](https://github.com/shred/tzxtools). Feel free to send pull requests.
-* Found a bug? [File a bug report!](https://github.com/shred/tzxtools/issues)
+* Fork the [Source code at Codeberg](https://codeberg.org/shred/tzxtools). Feel free to send pull requests.
+* Found a bug? [File a bug report!](https://codeberg.org/shred/tzxtools/issues)
 
 ## License
 

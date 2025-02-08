@@ -3,7 +3,7 @@
 # tzxtools - a collection for processing tzx files
 #
 # Copyright (C) 2018 Richard "Shred" Körber
-#   https://github.com/shred/tzxtools
+#   https://codeberg.org/shred/tzxtools
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

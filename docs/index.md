@@ -51,4 +51,4 @@ The TSX "ID 4B - Kansas City Standard" block is not a part of the specification.
 
 ## Open Source
 
-_tzxtools_ is open source software. The source code is available [at GitHub](https://github.com/shred/tzxtools), and is distributed under the terms of [GNU General Public License (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html#content).
+_tzxtools_ is open source software. The source code is available [at Codeberg](https://codeberg.org/shred/tzxtools), and is distributed under the terms of [GNU General Public License (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html#content).
