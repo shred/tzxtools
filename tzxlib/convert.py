@@ -41,7 +41,7 @@ UPPER = [ ' ', '▝', '▘', '▀', '▗', '▐', '▚', '▜', '▖', '▞', '�
     ' RANDOMIZE ', ' IF ', ' CLS ', ' DRAW ', ' CLEAR ', ' RETURN ', ' COPY ' ]
 
 def convChar(ch, noLeadingSpace=False):
-    if ch == 0x0D:   return os.linesep
+    if ch == 0x0D:   return '\n'
     elif ch >= 0x80:
         result = UPPER[ch - 0x80]
         if noLeadingSpace and ch >= 0xA5 and result[0] == ' ':
@@ -120,7 +120,7 @@ def convertToDump(data, out, org=0, bytesPerRow=16):
                 line += '   '
         line += '| '
         line += text
-        line += os.linesep
+        line += '\n'
         out.write(line.replace('\n', os.linesep).encode(getdefaultencoding()))
         pos += bytesPerRow
 
@@ -142,7 +142,7 @@ def convertToAssembler(data, out, org=0):
                 line += '   '
         line += ' '
         line += ins
-        line += os.linesep
+        line += '\n'
         out.write(line.replace('\n', os.linesep).encode(getdefaultencoding()))
         pos += length
 
