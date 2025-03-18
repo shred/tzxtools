@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.9.3 (2025-03-18)
+
+* `tzxcat`: Fix broken linebreaks on Windows (reported by @v-ein)
+
 ## v1.9.2 (2023-09-21)
 
 * `tzxplay`: Fix crash on zero length wavelets
