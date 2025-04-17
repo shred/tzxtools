@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.9.4 (2025-04-17)
+
+* `tzxcat`: Bright colors were not properly converted, fixed (reported by @PedroFreire)
+* `tzxcat`: Use the color palette of Fuse emulator for PNG conversion
+
 ## v1.9.3 (2025-03-18)
 
 * `tzxcat`: Fix broken linebreaks on Windows (reported by @v-ein)
